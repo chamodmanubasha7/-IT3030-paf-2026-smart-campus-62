@@ -90,3 +90,4 @@ Commit 779 on feature/auth-system by sayumi2003 <sayumi2003@users.noreply.github
 Commit 784 on feature/auth-system by chamodmanubasha7 <chamodmanubasha7@users.noreply.github.com>
 Commit 788 on feature/auth-system by DGAIndeepa <DGAIndeepa@users.noreply.github.com>
 Commit 823 on feature/auth-system by sayumi2003 <sayumi2003@users.noreply.github.com>
+Commit 827 on feature/auth-system by chamodmanubasha7 <chamodmanubasha7@users.noreply.github.com>
