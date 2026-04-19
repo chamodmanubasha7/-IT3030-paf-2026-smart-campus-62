@@ -384,169 +384,118 @@ export default function TicketList() {
         </div>
       </div>
 
-      {/* Tickets Table */}
-      <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-gradient-to-r from-gray-50 to-gray-100">
-              <tr>
-                <th 
-                  className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
-                  onClick={() => handleSort('title')}
-                >
-                  Title
-                  {sortBy === 'title' && (
-                    <span className="ml-1">{sortOrder === 'asc' ? '↑' : '↓'}</span>
-                  )}
-                </th>
-                <th 
-                  className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
-                  onClick={() => handleSort('userName')}
-                >
-                  User
-                  {sortBy === 'userName' && (
-                    <span className="ml-1">{sortOrder === 'asc' ? '↑' : '↓'}</span>
-                  )}
-                </th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                  Resource
-                </th>
-                <th 
-                  className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
-                  onClick={() => handleSort('priority')}
-                >
-                  Priority
-                  {sortBy === 'priority' && (
-                    <span className="ml-1">{sortOrder === 'asc' ? '↑' : '↓'}</span>
-                  )}
-                </th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                  Category
-                </th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                  Status
-                </th>
-                <th 
-                  className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
-                  onClick={() => handleSort('createdAt')}
-                >
-                  Created
-                  {sortBy === 'createdAt' && (
-                    <span className="ml-1">{sortOrder === 'asc' ? '↑' : '↓'}</span>
-                  )}
-                </th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {filteredTickets.length === 0 ? (
-                <tr>
-                  <td colSpan="8" className="px-6 py-16 text-center">
-                    <div className="flex flex-col items-center">
-                      <HiOutlineDocumentText className="w-16 h-16 text-gray-300 mb-4" />
-                      <p className="text-gray-500 text-lg font-medium">No tickets found</p>
-                      <p className="text-gray-400 text-sm mt-1">Try adjusting your filters or create a new ticket</p>
-                    </div>
-                  </td>
-                </tr>
-              ) : (
-                filteredTickets.map((ticket) => (
-                  <tr key={ticket.id} className="hover:bg-gradient-to-r hover:from-purple-50 hover:to-pink-50 transition-colors duration-200">
-                    <td className="px-6 py-4">
-                      <div className="flex items-start">
-                        <div className="flex-shrink-0 h-10 w-10 bg-gradient-to-br from-purple-500 to-pink-600 rounded-lg flex items-center justify-center">
-                          <HiOutlineTicket className="w-5 h-5 text-white" />
-                        </div>
-                        <div className="ml-4">
-                          <div className="text-sm font-semibold text-gray-900">
-                            {ticket.title}
-                          </div>
-                          <div className="text-sm text-gray-500 truncate max-w-xs">
-                            {ticket.description}
-                          </div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <div className="flex-shrink-0 h-8 w-8 bg-gray-100 rounded-full flex items-center justify-center">
-                          <HiOutlineUser className="w-4 h-4 text-gray-600" />
-                        </div>
-                        <div className="ml-3">
-                          <div className="text-sm font-medium text-gray-900">
-                            {ticket.userName}
-                          </div>
-                          <div className="text-sm text-gray-500 flex items-center">
-                            <HiOutlineMail className="w-3 h-3 mr-1" />
-                            {ticket.userEmail}
-                          </div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">
-                        {ticket.resource?.name || 'No resource'}
-                      </div>
-                      {ticket.resource?.location && (
-                        <div className="text-sm text-gray-500">
-                          {ticket.resource.location}
-                        </div>
-                      )}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold border ${getPriorityColor(ticket.priority)}`}>
-                        {ticket.priority}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center text-sm text-gray-600">
-                        {getCategoryIcon(ticket.category)}
-                        <span className="ml-1">{ticket.category}</span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold border ${getStatusColor(ticket.status)}`}>
-                        {getStatusIcon(ticket.status)}
-                        <span className="ml-1.5">{ticket.status}</span>
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                      {formatDate(ticket.createdAt)}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <div className="flex items-center space-x-2">
-                        <Link
-                          to={`/tickets/${ticket.id}`}
-                          className="p-2 text-purple-600 hover:text-purple-900 hover:bg-purple-50 rounded-lg transition-colors"
-                          title="View"
-                        >
-                          <HiOutlineEye className="w-5 h-5" />
-                        </Link>
-                        <Link
-                          to={`/tickets/${ticket.id}/edit`}
-                          className="p-2 text-indigo-600 hover:text-indigo-900 hover:bg-indigo-50 rounded-lg transition-colors"
-                          title="Edit"
-                        >
-                          <HiOutlinePencil className="w-5 h-5" />
-                        </Link>
-                        <button
-                          onClick={() => openDeleteModal(ticket)}
-                          className="p-2 text-red-600 hover:text-red-900 hover:bg-red-50 rounded-lg transition-colors"
-                          title="Delete"
-                        >
-                          <HiOutlineTrash className="w-5 h-5" />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+      {/* Tickets Grid */}
+      {filteredTickets.length === 0 ? (
+        <div className="bg-white rounded-2xl shadow-lg p-16 text-center">
+          <div className="flex flex-col items-center">
+            <HiOutlineDocumentText className="w-16 h-16 text-gray-300 mb-4" />
+            <p className="text-gray-500 text-lg font-medium">No tickets found</p>
+            <p className="text-gray-400 text-sm mt-1">Try adjusting your filters or create a new ticket</p>
+          </div>
         </div>
-      </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredTickets.map((ticket) => (
+            <div key={ticket.id} className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-200">
+              {/* Card Header */}
+              <div className="bg-gradient-to-r from-purple-500 to-pink-600 p-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <div className="p-2 bg-white/20 rounded-lg mr-3">
+                      <HiOutlineTicket className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-white font-semibold truncate max-w-[150px]">{ticket.title}</h3>
+                      <div className="flex items-center space-x-2 mt-1">
+                        <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold border-2 border-white/30 bg-white/20 text-white`}>
+                          {ticket.priority}
+                        </span>
+                        <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold border-2 border-white/30 bg-white/20 text-white`}>
+                          {getStatusIcon(ticket.status)}
+                          <span className="ml-1">{ticket.status}</span>
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Card Body */}
+              <div className="p-5 space-y-4">
+                {/* User Info */}
+                <div className="flex items-center p-3 bg-gray-50 rounded-xl">
+                  <div className="flex-shrink-0 h-10 w-10 bg-gradient-to-br from-purple-500 to-pink-600 rounded-full flex items-center justify-center">
+                    <HiOutlineUser className="w-5 h-5 text-white" />
+                  </div>
+                  <div className="ml-3 flex-1">
+                    <div className="text-sm font-semibold text-gray-900">{ticket.userName}</div>
+                    <div className="text-sm text-gray-500 flex items-center">
+                      <HiOutlineMail className="w-3 h-3 mr-1" />
+                      {ticket.userEmail}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Description */}
+                <div className="p-3 bg-gray-50 rounded-xl">
+                  <p className="text-sm text-gray-600 line-clamp-2">{ticket.description}</p>
+                </div>
+
+                {/* Category & Resource */}
+                <div className="space-y-2">
+                  <div className="flex items-center text-sm text-gray-700">
+                    {getCategoryIcon(ticket.category)}
+                    <span className="ml-2 font-medium">Category:</span>
+                    <span className="ml-2">{ticket.category}</span>
+                  </div>
+                  {ticket.resource?.name && (
+                    <div className="flex items-center text-sm text-gray-700">
+                      <HiOutlineSparkles className="w-4 h-4 text-purple-500 mr-2" />
+                      <span className="font-medium">Resource:</span>
+                      <span className="ml-2">{ticket.resource.name}</span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Created Date */}
+                <div className="flex items-center text-sm text-gray-500">
+                  <HiOutlineClock className="w-4 h-4 text-purple-500 mr-2" />
+                  <span>Created: {formatDate(ticket.createdAt)}</span>
+                </div>
+              </div>
+
+              {/* Card Footer */}
+              <div className="px-5 py-4 bg-gray-50 border-t border-gray-200">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <Link
+                      to={`/tickets/${ticket.id}`}
+                      className="p-2 text-purple-600 hover:text-purple-900 hover:bg-purple-100 rounded-lg transition-colors"
+                      title="View"
+                    >
+                      <HiOutlineEye className="w-5 h-5" />
+                    </Link>
+                    <Link
+                      to={`/tickets/${ticket.id}/edit`}
+                      className="p-2 text-indigo-600 hover:text-indigo-900 hover:bg-indigo-100 rounded-lg transition-colors"
+                      title="Edit"
+                    >
+                      <HiOutlinePencil className="w-5 h-5" />
+                    </Link>
+                    <button
+                      onClick={() => openDeleteModal(ticket)}
+                      className="p-2 text-red-600 hover:text-red-900 hover:bg-red-100 rounded-lg transition-colors"
+                      title="Delete"
+                    >
+                      <HiOutlineTrash className="w-5 h-5" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Delete Confirmation Modal */}
       {deleteModal.show && (

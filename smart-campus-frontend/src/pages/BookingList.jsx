@@ -318,152 +318,111 @@ export default function BookingList() {
         </div>
       </div>
 
-      {/* Bookings Table */}
-      <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-gradient-to-r from-gray-50 to-gray-100">
-              <tr>
-                <th 
-                  className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
-                  onClick={() => handleSort('resource.name')}
-                >
-                  Resource
-                  {sortBy === 'resource.name' && (
-                    <span className="ml-1">{sortOrder === 'asc' ? '↑' : '↓'}</span>
-                  )}
-                </th>
-                <th 
-                  className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
-                  onClick={() => handleSort('userName')}
-                >
-                  User
-                  {sortBy === 'userName' && (
-                    <span className="ml-1">{sortOrder === 'asc' ? '↑' : '↓'}</span>
-                  )}
-                </th>
-                <th 
-                  className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
-                  onClick={() => handleSort('startTime')}
-                >
-                  Start Time
-                  {sortBy === 'startTime' && (
-                    <span className="ml-1">{sortOrder === 'asc' ? '↑' : '↓'}</span>
-                  )}
-                </th>
-                <th 
-                  className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
-                  onClick={() => handleSort('endTime')}
-                >
-                  End Time
-                  {sortBy === 'endTime' && (
-                    <span className="ml-1">{sortOrder === 'asc' ? '↑' : '↓'}</span>
-                  )}
-                </th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                  Status
-                </th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {filteredBookings.length === 0 ? (
-                <tr>
-                  <td colSpan="6" className="px-6 py-16 text-center">
-                    <div className="flex flex-col items-center">
-                      <HiOutlineDocumentText className="w-16 h-16 text-gray-300 mb-4" />
-                      <p className="text-gray-500 text-lg font-medium">No bookings found</p>
-                      <p className="text-gray-400 text-sm mt-1">Try adjusting your filters or create a new booking</p>
-                    </div>
-                  </td>
-                </tr>
-              ) : (
-                filteredBookings.map((booking) => (
-                  <tr key={booking.id} className="hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 transition-colors duration-200">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <div className="flex-shrink-0 h-10 w-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-                          <HiOutlineSparkles className="w-5 h-5 text-white" />
-                        </div>
-                        <div className="ml-4">
-                          <div className="text-sm font-semibold text-gray-900">
-                            {booking.resource?.name || 'Unknown'}
-                          </div>
-                          <div className="text-sm text-gray-500 flex items-center">
-                            <HiOutlineLocationMarker className="w-3 h-3 mr-1" />
-                            {booking.resource?.location || ''}
-                          </div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <div className="flex-shrink-0 h-8 w-8 bg-gray-100 rounded-full flex items-center justify-center">
-                          <HiOutlineUser className="w-4 h-4 text-gray-600" />
-                        </div>
-                        <div className="ml-3">
-                          <div className="text-sm font-medium text-gray-900">
-                            {booking.userName}
-                          </div>
-                          <div className="text-sm text-gray-500 flex items-center">
-                            <HiOutlineMail className="w-3 h-3 mr-1" />
-                            {booking.userEmail}
-                          </div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center text-sm text-gray-900">
-                        <HiOutlineCalendar className="w-4 h-4 text-blue-500 mr-2" />
-                        {formatDate(booking.startTime)}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center text-sm text-gray-900">
-                        <HiOutlineClock className="w-4 h-4 text-purple-500 mr-2" />
-                        {formatDate(booking.endTime)}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold border ${getStatusColor(booking.status)}`}>
-                        {getStatusIcon(booking.status)}
-                        <span className="ml-1.5">{booking.status}</span>
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <div className="flex items-center space-x-2">
-                        <Link
-                          to={`/bookings/${booking.id}`}
-                          className="p-2 text-blue-600 hover:text-blue-900 hover:bg-blue-50 rounded-lg transition-colors"
-                          title="View"
-                        >
-                          <HiOutlineEye className="w-5 h-5" />
-                        </Link>
-                        <Link
-                          to={`/bookings/${booking.id}/edit`}
-                          className="p-2 text-indigo-600 hover:text-indigo-900 hover:bg-indigo-50 rounded-lg transition-colors"
-                          title="Edit"
-                        >
-                          <HiOutlinePencil className="w-5 h-5" />
-                        </Link>
-                        <button
-                          onClick={() => openDeleteModal(booking)}
-                          className="p-2 text-red-600 hover:text-red-900 hover:bg-red-50 rounded-lg transition-colors"
-                          title="Delete"
-                        >
-                          <HiOutlineTrash className="w-5 h-5" />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+      {/* Bookings Grid */}
+      {filteredBookings.length === 0 ? (
+        <div className="bg-white rounded-2xl shadow-lg p-16 text-center">
+          <div className="flex flex-col items-center">
+            <HiOutlineDocumentText className="w-16 h-16 text-gray-300 mb-4" />
+            <p className="text-gray-500 text-lg font-medium">No bookings found</p>
+            <p className="text-gray-400 text-sm mt-1">Try adjusting your filters or create a new booking</p>
+          </div>
         </div>
-      </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredBookings.map((booking) => (
+            <div key={booking.id} className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-200">
+              {/* Card Header */}
+              <div className="bg-gradient-to-r from-blue-500 to-purple-600 p-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <div className="p-2 bg-white/20 rounded-lg mr-3">
+                      <HiOutlineSparkles className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-white font-semibold">{booking.resource?.name || 'Unknown'}</h3>
+                      <p className="text-blue-100 text-sm flex items-center">
+                        <HiOutlineLocationMarker className="w-3 h-3 mr-1" />
+                        {booking.resource?.location || ''}
+                      </p>
+                    </div>
+                  </div>
+                  <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold border-2 border-white/30 bg-white/20 text-white`}>
+                    {getStatusIcon(booking.status)}
+                    <span className="ml-1.5">{booking.status}</span>
+                  </span>
+                </div>
+              </div>
+
+              {/* Card Body */}
+              <div className="p-5 space-y-4">
+                {/* User Info */}
+                <div className="flex items-center p-3 bg-gray-50 rounded-xl">
+                  <div className="flex-shrink-0 h-10 w-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+                    <HiOutlineUser className="w-5 h-5 text-white" />
+                  </div>
+                  <div className="ml-3 flex-1">
+                    <div className="text-sm font-semibold text-gray-900">{booking.userName}</div>
+                    <div className="text-sm text-gray-500 flex items-center">
+                      <HiOutlineMail className="w-3 h-3 mr-1" />
+                      {booking.userEmail}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Time Info */}
+                <div className="space-y-2">
+                  <div className="flex items-center text-sm text-gray-700">
+                    <HiOutlineCalendar className="w-4 h-4 text-blue-500 mr-2" />
+                    <span className="font-medium">Start:</span>
+                    <span className="ml-2">{formatDate(booking.startTime)}</span>
+                  </div>
+                  <div className="flex items-center text-sm text-gray-700">
+                    <HiOutlineClock className="w-4 h-4 text-purple-500 mr-2" />
+                    <span className="font-medium">End:</span>
+                    <span className="ml-2">{formatDate(booking.endTime)}</span>
+                  </div>
+                </div>
+
+                {/* Purpose */}
+                {booking.purpose && (
+                  <div className="p-3 bg-gray-50 rounded-xl">
+                    <p className="text-sm text-gray-600">{booking.purpose}</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Card Footer */}
+              <div className="px-5 py-4 bg-gray-50 border-t border-gray-200">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <Link
+                      to={`/bookings/${booking.id}`}
+                      className="p-2 text-blue-600 hover:text-blue-900 hover:bg-blue-100 rounded-lg transition-colors"
+                      title="View"
+                    >
+                      <HiOutlineEye className="w-5 h-5" />
+                    </Link>
+                    <Link
+                      to={`/bookings/${booking.id}/edit`}
+                      className="p-2 text-indigo-600 hover:text-indigo-900 hover:bg-indigo-100 rounded-lg transition-colors"
+                      title="Edit"
+                    >
+                      <HiOutlinePencil className="w-5 h-5" />
+                    </Link>
+                    <button
+                      onClick={() => openDeleteModal(booking)}
+                      className="p-2 text-red-600 hover:text-red-900 hover:bg-red-100 rounded-lg transition-colors"
+                      title="Delete"
+                    >
+                      <HiOutlineTrash className="w-5 h-5" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Delete Confirmation Modal */}
       {deleteModal.show && (
