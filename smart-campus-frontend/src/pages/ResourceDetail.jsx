@@ -55,20 +55,17 @@ export default function ResourceDetail() {
       LECTURE_HALL: '🏫',
       LAB: '🔬',
       MEETING_ROOM: '🏢',
-      PROJECTOR: '📽️',
-      CAMERA: '📷',
-      WHITEBOARD: '📋',
-      COMPUTER: '💻',
-      OTHER: '📦'
+      PROJECTOR: '📽️'
     };
     return icons[type] || '📦';
   };
 
   const getStatusClass = (status) => {
     const classes = {
-      ACTIVE: 'active',
-      OUT_OF_SERVICE: 'out-of-service',
-      UNDER_MAINTENANCE: 'under-maintenance'
+      AVAILABLE: 'active',
+      UNAVAILABLE: 'out-of-service',
+      MAINTENANCE: 'under-maintenance',
+      OCCUPIED: 'out-of-service'
     };
     return classes[status] || '';
   };

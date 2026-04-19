@@ -3,7 +3,9 @@ import {
   HiOutlineCube, 
   HiOutlineViewGrid, 
   HiOutlinePlusCircle,
-  HiOutlineCog
+  HiOutlineCog,
+  HiOutlineCalendar,
+  HiOutlineTicket
 } from 'react-icons/hi';
 
 /**
@@ -71,7 +73,43 @@ export default function Sidebar() {
           className={({ isActive }) => isActive ? 'active' : ''}
         >
           <HiOutlineCog />
-          Equipment
+          Projectors
+        </NavLink>
+
+        <div className="sidebar-section-title">Booking Management</div>
+        
+        <NavLink 
+          to="/bookings" 
+          className={({ isActive }) => isActive ? 'active' : ''}
+        >
+          <HiOutlineCalendar />
+          All Bookings
+        </NavLink>
+
+        <NavLink 
+          to="/bookings/create" 
+          className={({ isActive }) => isActive ? 'active' : ''}
+        >
+          <HiOutlinePlusCircle />
+          Create Booking
+        </NavLink>
+
+        <div className="sidebar-section-title">Ticket Management</div>
+        
+        <NavLink 
+          to="/tickets" 
+          className={({ isActive }) => isActive ? 'active' : ''}
+        >
+          <HiOutlineTicket />
+          All Tickets
+        </NavLink>
+
+        <NavLink 
+          to="/tickets/create" 
+          className={({ isActive }) => isActive ? 'active' : ''}
+        >
+          <HiOutlinePlusCircle />
+          Create Ticket
         </NavLink>
       </nav>
     </aside>

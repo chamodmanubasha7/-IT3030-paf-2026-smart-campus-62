@@ -87,20 +87,17 @@ export default function ResourceList() {
       LECTURE_HALL: '🏫',
       LAB: '🔬',
       MEETING_ROOM: '🏢',
-      PROJECTOR: '📽️',
-      CAMERA: '📷',
-      WHITEBOARD: '📋',
-      COMPUTER: '💻',
-      OTHER: '📦'
+      PROJECTOR: '📽️'
     };
     return icons[type] || '📦';
   };
 
   const getStatusClass = (status) => {
     const classes = {
-      ACTIVE: 'active',
-      OUT_OF_SERVICE: 'out-of-service',
-      UNDER_MAINTENANCE: 'under-maintenance'
+      AVAILABLE: 'active',
+      UNAVAILABLE: 'out-of-service',
+      MAINTENANCE: 'under-maintenance',
+      OCCUPIED: 'out-of-service'
     };
     return classes[status] || '';
   };
@@ -122,9 +119,9 @@ export default function ResourceList() {
 
   // Stats
   const totalCount = resources.length;
-  const activeCount = resources.filter(r => r.status === 'ACTIVE').length;
-  const maintenanceCount = resources.filter(r => r.status === 'UNDER_MAINTENANCE').length;
-  const outOfServiceCount = resources.filter(r => r.status === 'OUT_OF_SERVICE').length;
+  const activeCount = resources.filter(r => r.status === 'AVAILABLE').length;
+  const maintenanceCount = resources.filter(r => r.status === 'MAINTENANCE').length;
+  const outOfServiceCount = resources.filter(r => r.status === 'UNAVAILABLE' || r.status === 'OCCUPIED').length;
 
   if (loading) {
     return (
@@ -157,7 +154,7 @@ export default function ResourceList() {
               <div className="stat-card-icon"><HiOutlineCheckCircle /></div>
             </div>
             <div className="stat-card-value">{activeCount}</div>
-            <div className="stat-card-label">Active</div>
+            <div className="stat-card-label">Available</div>
           </div>
           <div className="stat-card amber">
             <div className="stat-card-header">
@@ -200,10 +197,6 @@ export default function ResourceList() {
             <option value="LAB">Labs</option>
             <option value="MEETING_ROOM">Meeting Rooms</option>
             <option value="PROJECTOR">Projectors</option>
-            <option value="CAMERA">Cameras</option>
-            <option value="WHITEBOARD">Whiteboards</option>
-            <option value="COMPUTER">Computers</option>
-            <option value="OTHER">Other</option>
           </select>
         )}
 
@@ -213,9 +206,10 @@ export default function ResourceList() {
           onChange={(e) => setStatusFilter(e.target.value)}
         >
           <option value="ALL">All Status</option>
-          <option value="ACTIVE">Active</option>
-          <option value="OUT_OF_SERVICE">Out of Service</option>
-          <option value="UNDER_MAINTENANCE">Under Maintenance</option>
+          <option value="AVAILABLE">Available</option>
+          <option value="UNAVAILABLE">Unavailable</option>
+          <option value="MAINTENANCE">Maintenance</option>
+          <option value="OCCUPIED">Occupied</option>
         </select>
 
         <Link to="/resources/new" className="btn btn-primary">

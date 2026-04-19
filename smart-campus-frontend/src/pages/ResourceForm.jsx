@@ -20,7 +20,7 @@ export default function ResourceForm() {
     location: '',
     building: '',
     floor: '',
-    status: 'ACTIVE',
+    status: 'AVAILABLE',
     availableFrom: '',
     availableTo: '',
     imageUrl: '',
@@ -48,7 +48,7 @@ export default function ResourceForm() {
         location: data.location || '',
         building: data.building || '',
         floor: data.floor || '',
-        status: data.status || 'ACTIVE',
+        status: data.status || 'AVAILABLE',
         availableFrom: data.availableFrom || '',
         availableTo: data.availableTo || '',
         imageUrl: data.imageUrl || '',
@@ -67,7 +67,7 @@ export default function ResourceForm() {
     if (formData.name.length > 100) newErrors.name = 'Name must be under 100 characters';
     if (!formData.location.trim()) newErrors.location = 'Location is required';
     if (formData.capacity && formData.capacity < 1) newErrors.capacity = 'Capacity must be at least 1';
-    if (formData.availableFrom && formData.availableTo && formData.availableFrom >= formData.availableTo) {
+    if (formData.availableFrom && formData.availableTo && new Date(formData.availableFrom) >= new Date(formData.availableTo)) {
       newErrors.availableTo = 'Must be after the start time';
     }
     setErrors(newErrors);
@@ -164,10 +164,6 @@ export default function ResourceForm() {
                 <option value="LAB">Lab</option>
                 <option value="MEETING_ROOM">Meeting Room</option>
                 <option value="PROJECTOR">Projector</option>
-                <option value="CAMERA">Camera</option>
-                <option value="WHITEBOARD">Whiteboard</option>
-                <option value="COMPUTER">Computer</option>
-                <option value="OTHER">Other</option>
               </select>
             </div>
 
@@ -226,9 +222,10 @@ export default function ResourceForm() {
             <div className="form-group">
               <label>Status</label>
               <select name="status" value={formData.status} onChange={handleChange}>
-                <option value="ACTIVE">Active</option>
-                <option value="OUT_OF_SERVICE">Out of Service</option>
-                <option value="UNDER_MAINTENANCE">Under Maintenance</option>
+                <option value="AVAILABLE">Available</option>
+                <option value="UNAVAILABLE">Unavailable</option>
+                <option value="MAINTENANCE">Maintenance</option>
+                <option value="OCCUPIED">Occupied</option>
               </select>
             </div>
 
@@ -248,7 +245,7 @@ export default function ResourceForm() {
             <div className="form-group">
               <label>Available From</label>
               <input
-                type="time"
+                type="datetime-local"
                 name="availableFrom"
                 value={formData.availableFrom}
                 onChange={handleChange}
@@ -259,7 +256,7 @@ export default function ResourceForm() {
             <div className="form-group">
               <label>Available To</label>
               <input
-                type="time"
+                type="datetime-local"
                 name="availableTo"
                 value={formData.availableTo}
                 onChange={handleChange}

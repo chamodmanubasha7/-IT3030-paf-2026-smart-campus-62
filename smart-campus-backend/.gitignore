@@ -51,6 +51,9 @@ jps/
 *.java.tmp
 *.java.orig
 
+# Temporarily allow Java source files for compilation fixes
+!src/main/java/**/*.java
+
 # Compiled class files
 *.class
 *.classx
