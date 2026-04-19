@@ -1,0 +1,14 @@
+# Monorepo: backend (Spring) + frontend (Vite/React)
+**/node_modules/
+**/target/
+**/dist/
+**/dist-ssr/
+**/.env
+**/.idea/
+*.log
+logs/
+.DS_Store
+**/nbproject/
+**/build/
+!**/src/main/**/build/
+!**/src/test/**/build/
