@@ -10,7 +10,7 @@ export default function HomePage() {
       {/* Hero Section */}
       <div className="hero-section">
         <div className="hero-content">
-          <h1 className="hero-title">Smart Campus Operations Hub</h1>
+          <h1 className="hero-title">Sliit Smart Campus</h1>
           <p className="hero-subtitle">
             Manage campus facilities, resources, and equipment efficiently
           </p>
