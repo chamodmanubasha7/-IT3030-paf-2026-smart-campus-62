@@ -45,3 +45,4 @@ Commit 657 on feature/notifications by sayumi2003 <sayumi2003@users.noreply.gith
 Commit 307 on feature/notifications by sayumi2003 <sayumi2003@users.noreply.github.com>
 Commit 311 on develop by chamodmanubasha7 <chamodmanubasha7@users.noreply.github.com>
 Commit 662 on feature/facility-mgmt by Nawoda0105 <Nawoda0105@users.noreply.github.com>
+Commit 680 on feature/facility-mgmt by chamodmanubasha7 <chamodmanubasha7@users.noreply.github.com>
