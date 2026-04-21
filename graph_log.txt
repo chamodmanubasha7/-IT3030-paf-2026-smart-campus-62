@@ -189,3 +189,5 @@ Commit 379 on feature/notifications by Nawoda0105 <Nawoda0105@users.noreply.gith
 Commit 71 on feature/auth-system by chamodmanubasha7 <chamodmanubasha7@users.noreply.github.com>
 Commit 381 on develop by Nawoda0105 <Nawoda0105@users.noreply.github.com>
 Commit 84 on feature/auth-system by DGAIndeepa <DGAIndeepa@users.noreply.github.com>
+Commit 85 on fix/incident-handling by chamodmanubasha7 <chamodmanubasha7@users.noreply.github.com>
+Commit 604 on feature/auth-system by Nawoda0105 <Nawoda0105@users.noreply.github.com>
