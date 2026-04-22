@@ -46,3 +46,6 @@ Commit 201 on feature/auth-system by DGAIndeepa <DGAIndeepa@users.noreply.github
 Commit 204 on feature/auth-system by chamodmanubasha7 <chamodmanubasha7@users.noreply.github.com>
 Commit 206 on feature/auth-system by DGAIndeepa <DGAIndeepa@users.noreply.github.com>
 Commit 230 on feature/auth-system by DGAIndeepa <DGAIndeepa@users.noreply.github.com>
+Commit 784 on main by chamodmanubasha7 <chamodmanubasha7@users.noreply.github.com>
+Commit 232 on feature/auth-system by Nawoda0105 <Nawoda0105@users.noreply.github.com>
+Commit 570 on develop by chamodmanubasha7 <chamodmanubasha7@users.noreply.github.com>
