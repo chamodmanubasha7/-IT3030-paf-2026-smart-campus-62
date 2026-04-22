@@ -47,3 +47,4 @@ Commit 184 on develop by DGAIndeepa <DGAIndeepa@users.noreply.github.com>
 Commit 185 on feature/facility-mgmt by sayumi2003 <sayumi2003@users.noreply.github.com>
 Commit 186 on develop by Nawoda0105 <Nawoda0105@users.noreply.github.com>
 Commit 187 on develop by DGAIndeepa <DGAIndeepa@users.noreply.github.com>
+Commit 189 on fix/incident-handling by chamodmanubasha7 <chamodmanubasha7@users.noreply.github.com>
