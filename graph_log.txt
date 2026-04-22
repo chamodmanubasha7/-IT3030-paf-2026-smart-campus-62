@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 ﻿Commit 1 on main by DGAIndeepa <DGAIndeepa@users.noreply.github.com>
 Commit 3 on main by DGAIndeepa <DGAIndeepa@users.noreply.github.com>
 Commit 5 on main by sayumi2003 <sayumi2003@users.noreply.github.com>
@@ -32,6 +33,8 @@ Commit 50 on develop by DGAIndeepa <DGAIndeepa@users.noreply.github.com>
 Commit 51 on develop by sayumi2003 <sayumi2003@users.noreply.github.com>
 Commit 54 on develop by sayumi2003 <sayumi2003@users.noreply.github.com>
 =======
+=======
+>>>>>>> fix/incident-handling
 ﻿Commit 2 on fix/incident-handling by Nawoda0105 <Nawoda0105@users.noreply.github.com>
 Commit 7 on fix/incident-handling by Nawoda0105 <Nawoda0105@users.noreply.github.com>
 Commit 9 on fix/incident-handling by sayumi2003 <sayumi2003@users.noreply.github.com>
@@ -45,6 +48,7 @@ Commit 37 on fix/incident-handling by sayumi2003 <sayumi2003@users.noreply.githu
 Commit 38 on fix/incident-handling by sayumi2003 <sayumi2003@users.noreply.github.com>
 Commit 45 on fix/incident-handling by sayumi2003 <sayumi2003@users.noreply.github.com>
 Commit 55 on fix/incident-handling by chamodmanubasha7 <chamodmanubasha7@users.noreply.github.com>
+<<<<<<< HEAD
 >>>>>>> fix/incident-handling
 Commit 61 on feature/notifications by sayumi2003 <sayumi2003@users.noreply.github.com>
 >>>>>>> develop
@@ -80,3 +84,50 @@ Commit 203 on main by Nawoda0105 <Nawoda0105@users.noreply.github.com>
 Commit 204 on main by Nawoda0105 <Nawoda0105@users.noreply.github.com>
 Commit 205 on feature/facility-mgmt by DGAIndeepa <DGAIndeepa@users.noreply.github.com>
 Commit 210 on main by chamodmanubasha7 <chamodmanubasha7@users.noreply.github.com>
+=======
+Commit 62 on fix/incident-handling by Nawoda0105 <Nawoda0105@users.noreply.github.com>
+Commit 70 on fix/incident-handling by Nawoda0105 <Nawoda0105@users.noreply.github.com>
+Commit 71 on fix/incident-handling by DGAIndeepa <DGAIndeepa@users.noreply.github.com>
+Commit 72 on fix/incident-handling by DGAIndeepa <DGAIndeepa@users.noreply.github.com>
+Commit 80 on fix/incident-handling by sayumi2003 <sayumi2003@users.noreply.github.com>
+Commit 92 on fix/incident-handling by DGAIndeepa <DGAIndeepa@users.noreply.github.com>
+Commit 93 on fix/incident-handling by sayumi2003 <sayumi2003@users.noreply.github.com>
+Commit 94 on fix/incident-handling by DGAIndeepa <DGAIndeepa@users.noreply.github.com>
+Commit 113 on fix/incident-handling by DGAIndeepa <DGAIndeepa@users.noreply.github.com>
+Commit 123 on fix/incident-handling by Nawoda0105 <Nawoda0105@users.noreply.github.com>
+Commit 126 on fix/incident-handling by Nawoda0105 <Nawoda0105@users.noreply.github.com>
+Commit 128 on fix/incident-handling by chamodmanubasha7 <chamodmanubasha7@users.noreply.github.com>
+Commit 133 on fix/incident-handling by Nawoda0105 <Nawoda0105@users.noreply.github.com>
+Commit 137 on fix/incident-handling by sayumi2003 <sayumi2003@users.noreply.github.com>
+Commit 143 on fix/incident-handling by chamodmanubasha7 <chamodmanubasha7@users.noreply.github.com>
+Commit 144 on feature/auth-system by Nawoda0105 <Nawoda0105@users.noreply.github.com>
+Commit 145 on feature/facility-mgmt by sayumi2003 <sayumi2003@users.noreply.github.com>
+Commit 146 on develop by Nawoda0105 <Nawoda0105@users.noreply.github.com>
+Commit 150 on fix/incident-handling by DGAIndeepa <DGAIndeepa@users.noreply.github.com>
+=======
+﻿Commit 147 on feature/notifications by Nawoda0105 <Nawoda0105@users.noreply.github.com>
+>>>>>>> feature/notifications
+Commit 151 on develop by chamodmanubasha7 <chamodmanubasha7@users.noreply.github.com>
+Commit 152 on feature/auth-system by DGAIndeepa <DGAIndeepa@users.noreply.github.com>
+Commit 154 on fix/incident-handling by sayumi2003 <sayumi2003@users.noreply.github.com>
+Commit 173 on fix/incident-handling by sayumi2003 <sayumi2003@users.noreply.github.com>
+Commit 174 on develop by sayumi2003 <sayumi2003@users.noreply.github.com>
+Commit 175 on develop by DGAIndeepa <DGAIndeepa@users.noreply.github.com>
+Commit 177 on fix/incident-handling by sayumi2003 <sayumi2003@users.noreply.github.com>
+Commit 179 on fix/incident-handling by chamodmanubasha7 <chamodmanubasha7@users.noreply.github.com>
+Commit 183 on fix/incident-handling by Nawoda0105 <Nawoda0105@users.noreply.github.com>
+Commit 184 on develop by DGAIndeepa <DGAIndeepa@users.noreply.github.com>
+Commit 185 on feature/facility-mgmt by sayumi2003 <sayumi2003@users.noreply.github.com>
+Commit 186 on develop by Nawoda0105 <Nawoda0105@users.noreply.github.com>
+Commit 187 on develop by DGAIndeepa <DGAIndeepa@users.noreply.github.com>
+Commit 189 on fix/incident-handling by chamodmanubasha7 <chamodmanubasha7@users.noreply.github.com>
+Commit 190 on develop by DGAIndeepa <DGAIndeepa@users.noreply.github.com>
+Commit 191 on feature/facility-mgmt by chamodmanubasha7 <chamodmanubasha7@users.noreply.github.com>
+Commit 192 on develop by sayumi2003 <sayumi2003@users.noreply.github.com>
+Commit 193 on develop by chamodmanubasha7 <chamodmanubasha7@users.noreply.github.com>
+Commit 206 on fix/incident-handling by chamodmanubasha7 <chamodmanubasha7@users.noreply.github.com>
+Commit 207 on develop by Nawoda0105 <Nawoda0105@users.noreply.github.com>
+Commit 208 on feature/auth-system by chamodmanubasha7 <chamodmanubasha7@users.noreply.github.com>
+Commit 209 on develop by DGAIndeepa <DGAIndeepa@users.noreply.github.com>
+>>>>>>> fix/incident-handling
+Commit 211 on feature/notifications by DGAIndeepa <DGAIndeepa@users.noreply.github.com>
