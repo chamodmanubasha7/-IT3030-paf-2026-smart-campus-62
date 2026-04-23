@@ -168,3 +168,4 @@ Commit 626 on feature/facility-mgmt by DGAIndeepa <DGAIndeepa@users.noreply.gith
 Commit 636 on feature/facility-mgmt by chamodmanubasha7 <chamodmanubasha7@users.noreply.github.com>
 Commit 643 on feature/facility-mgmt by chamodmanubasha7 <chamodmanubasha7@users.noreply.github.com>
 Commit 644 on feature/facility-mgmt by chamodmanubasha7 <chamodmanubasha7@users.noreply.github.com>
+Commit 650 on feature/facility-mgmt by DGAIndeepa <DGAIndeepa@users.noreply.github.com>
