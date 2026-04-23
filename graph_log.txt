@@ -150,5 +150,5 @@ Commit 568 on fix/incident-handling by chamodmanubasha7 <chamodmanubasha7@users.
 Commit 578 on fix/incident-handling by DGAIndeepa <DGAIndeepa@users.noreply.github.com>
 Commit 585 on fix/incident-handling by Nawoda0105 <Nawoda0105@users.noreply.github.com>
 Commit 593 on fix/incident-handling by DGAIndeepa <DGAIndeepa@users.noreply.github.com>
-Commit 616 on develop by Nawoda0105 <Nawoda0105@users.noreply.github.com>
-Commit 621 on develop by Nawoda0105 <Nawoda0105@users.noreply.github.com>
+Commit 606 on fix/incident-handling by sayumi2003 <sayumi2003@users.noreply.github.com>
+Commit 625 on fix/incident-handling by DGAIndeepa <DGAIndeepa@users.noreply.github.com>
