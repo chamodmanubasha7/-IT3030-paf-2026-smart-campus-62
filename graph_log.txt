@@ -328,3 +328,9 @@ Commit 461 on main by sayumi2003 <sayumi2003@users.noreply.github.com>
 Commit 152 on fix/incident-handling by Nawoda0105 <Nawoda0105@users.noreply.github.com>
 Commit 462 on fix/incident-handling by DGAIndeepa <DGAIndeepa@users.noreply.github.com>
 Commit 676 on develop by DGAIndeepa <DGAIndeepa@users.noreply.github.com>
+Commit 154 on fix/incident-handling by chamodmanubasha7 <chamodmanubasha7@users.noreply.github.com>
+Commit 464 on feature/notifications by Nawoda0105 <Nawoda0105@users.noreply.github.com>
+Commit 678 on feature/auth-system by DGAIndeepa <DGAIndeepa@users.noreply.github.com>
+Commit 155 on main by Nawoda0105 <Nawoda0105@users.noreply.github.com>
+Commit 465 on main by chamodmanubasha7 <chamodmanubasha7@users.noreply.github.com>
+Commit 679 on main by chamodmanubasha7 <chamodmanubasha7@users.noreply.github.com>
