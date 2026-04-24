@@ -144,3 +144,5 @@ Commit 466 on feature/facility-mgmt by DGAIndeepa <DGAIndeepa@users.noreply.gith
 Commit 470 on fix/incident-handling by chamodmanubasha7 <chamodmanubasha7@users.noreply.github.com>
 Commit 241 on fix/incident-handling by DGAIndeepa <DGAIndeepa@users.noreply.github.com>
 Commit 472 on develop by DGAIndeepa <DGAIndeepa@users.noreply.github.com>
+Commit 474 on feature/facility-mgmt by chamodmanubasha7 <chamodmanubasha7@users.noreply.github.com>
+Commit 243 on fix/incident-handling by DGAIndeepa <DGAIndeepa@users.noreply.github.com>
