@@ -192,3 +192,4 @@ Commit 670 on feature/notifications by DGAIndeepa <DGAIndeepa@users.noreply.gith
 Commit 704 on feature/notifications by chamodmanubasha7 <chamodmanubasha7@users.noreply.github.com>
 Commit 708 on feature/notifications by DGAIndeepa <DGAIndeepa@users.noreply.github.com>
 Commit 714 on feature/notifications by Nawoda0105 <Nawoda0105@users.noreply.github.com>
+Commit 727 on develop by chamodmanubasha7 <chamodmanubasha7@users.noreply.github.com>
