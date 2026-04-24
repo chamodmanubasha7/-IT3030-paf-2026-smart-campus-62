@@ -341,3 +341,5 @@ Commit 167 on fix/incident-handling by DGAIndeepa <DGAIndeepa@users.noreply.gith
 Commit 178 on fix/incident-handling by Nawoda0105 <Nawoda0105@users.noreply.github.com>
 Commit 722 on fix/incident-handling by Nawoda0105 <Nawoda0105@users.noreply.github.com>
 Commit 508 on fix/incident-handling by Nawoda0105 <Nawoda0105@users.noreply.github.com>
+Commit 509 on fix/incident-handling by DGAIndeepa <DGAIndeepa@users.noreply.github.com>
+Commit 723 on feature/auth-system by Nawoda0105 <Nawoda0105@users.noreply.github.com>
