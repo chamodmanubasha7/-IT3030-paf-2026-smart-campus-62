@@ -265,3 +265,6 @@ Commit 290 on develop by Nawoda0105 <Nawoda0105@users.noreply.github.com>
 Commit 519 on feature/facility-mgmt by DGAIndeepa <DGAIndeepa@users.noreply.github.com>
 Commit 291 on feature/auth-system by chamodmanubasha7 <chamodmanubasha7@users.noreply.github.com>
 Commit 520 on fix/incident-handling by DGAIndeepa <DGAIndeepa@users.noreply.github.com>
+Commit 292 on feature/notifications by Nawoda0105 <Nawoda0105@users.noreply.github.com>
+Commit 521 on main by DGAIndeepa <DGAIndeepa@users.noreply.github.com>
+Commit 293 on feature/notifications by sayumi2003 <sayumi2003@users.noreply.github.com>
