@@ -27,3 +27,5 @@ Commit 946 on feature/auth-system by DGAIndeepa <DGAIndeepa@users.noreply.github
 Commit 247 on fix/incident-handling by chamodmanubasha7 <chamodmanubasha7@users.noreply.github.com>
 Commit 955 on main by DGAIndeepa <DGAIndeepa@users.noreply.github.com>
 Commit 249 on main by chamodmanubasha7 <chamodmanubasha7@users.noreply.github.com>
+Commit 619 on feature/notifications by chamodmanubasha7 <chamodmanubasha7@users.noreply.github.com>
+Commit 269 on feature/notifications by sayumi2003 <sayumi2003@users.noreply.github.com>
