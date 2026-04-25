@@ -205,3 +205,4 @@ Commit 788 on feature/notifications by DGAIndeepa <DGAIndeepa@users.noreply.gith
 Commit 791 on feature/notifications by sayumi2003 <sayumi2003@users.noreply.github.com>
 Commit 793 on feature/notifications by chamodmanubasha7 <chamodmanubasha7@users.noreply.github.com>
 Commit 803 on feature/notifications by chamodmanubasha7 <chamodmanubasha7@users.noreply.github.com>
+Commit 812 on feature/notifications by sayumi2003 <sayumi2003@users.noreply.github.com>
