@@ -43,3 +43,4 @@ Commit 526 on develop by DGAIndeepa <DGAIndeepa@users.noreply.github.com>
 Commit 539 on feature/notifications by chamodmanubasha7 <chamodmanubasha7@users.noreply.github.com>
 Commit 753 on feature/auth-system by sayumi2003 <sayumi2003@users.noreply.github.com>
 Commit 201 on feature/auth-system by DGAIndeepa <DGAIndeepa@users.noreply.github.com>
+Commit 204 on feature/auth-system by chamodmanubasha7 <chamodmanubasha7@users.noreply.github.com>
