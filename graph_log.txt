@@ -204,3 +204,4 @@ Commit 811 on feature/facility-mgmt by chamodmanubasha7 <chamodmanubasha7@users.
 Commit 825 on feature/facility-mgmt by sayumi2003 <sayumi2003@users.noreply.github.com>
 Commit 830 on feature/facility-mgmt by chamodmanubasha7 <chamodmanubasha7@users.noreply.github.com>
 Commit 831 on feature/facility-mgmt by DGAIndeepa <DGAIndeepa@users.noreply.github.com>
+Commit 833 on feature/facility-mgmt by sayumi2003 <sayumi2003@users.noreply.github.com>
