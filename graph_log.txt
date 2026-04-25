@@ -67,3 +67,4 @@ Commit 818 on feature/facility-mgmt by Nawoda0105 <Nawoda0105@users.noreply.gith
 Commit 88 on feature/facility-mgmt by chamodmanubasha7 <chamodmanubasha7@users.noreply.github.com>
 Commit 839 on feature/facility-mgmt by chamodmanubasha7 <chamodmanubasha7@users.noreply.github.com>
 Commit 841 on feature/facility-mgmt by DGAIndeepa <DGAIndeepa@users.noreply.github.com>
+Commit 842 on feature/facility-mgmt by sayumi2003 <sayumi2003@users.noreply.github.com>
