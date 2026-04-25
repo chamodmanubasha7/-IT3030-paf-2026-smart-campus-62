@@ -51,3 +51,5 @@ Commit 232 on feature/auth-system by Nawoda0105 <Nawoda0105@users.noreply.github
 Commit 570 on develop by chamodmanubasha7 <chamodmanubasha7@users.noreply.github.com>
 Commit 796 on feature/auth-system by Nawoda0105 <Nawoda0105@users.noreply.github.com>
 Commit 581 on fix/incident-handling by DGAIndeepa <DGAIndeepa@users.noreply.github.com>
+Commit 799 on main by sayumi2003 <sayumi2003@users.noreply.github.com>
+Commit 584 on feature/auth-system by chamodmanubasha7 <chamodmanubasha7@users.noreply.github.com>
