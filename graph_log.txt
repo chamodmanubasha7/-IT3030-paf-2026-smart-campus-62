@@ -51,3 +51,4 @@ Commit 703 on feature/facility-mgmt by DGAIndeepa <DGAIndeepa@users.noreply.gith
 Commit 369 on feature/facility-mgmt by DGAIndeepa <DGAIndeepa@users.noreply.github.com>
 Commit 373 on feature/facility-mgmt by sayumi2003 <sayumi2003@users.noreply.github.com>
 Commit 724 on develop by DGAIndeepa <DGAIndeepa@users.noreply.github.com>
+Commit 730 on feature/facility-mgmt by DGAIndeepa <DGAIndeepa@users.noreply.github.com>
