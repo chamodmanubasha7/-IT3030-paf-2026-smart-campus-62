@@ -27,3 +27,5 @@ Commit 12 on develop by Nawoda0105 <Nawoda0105@users.noreply.github.com>
 Commit 930 on feature/notifications by Nawoda0105 <Nawoda0105@users.noreply.github.com>
 Commit 389 on develop by chamodmanubasha7 <chamodmanubasha7@users.noreply.github.com>
 Commit 42 on develop by chamodmanubasha7 <chamodmanubasha7@users.noreply.github.com>
+Commit 971 on feature/notifications by Nawoda0105 <Nawoda0105@users.noreply.github.com>
+Commit 55 on develop by Nawoda0105 <Nawoda0105@users.noreply.github.com>
