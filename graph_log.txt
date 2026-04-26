@@ -1,3 +1,34 @@
+<<<<<<< Updated upstream
+﻿Commit 273 on feature/facility-mgmt by chamodmanubasha7 <chamodmanubasha7@users.noreply.github.com>
+Commit 824 on fix/incident-handling by DGAIndeepa <DGAIndeepa@users.noreply.github.com>
+Commit 619 on feature/notifications by chamodmanubasha7 <chamodmanubasha7@users.noreply.github.com>
+Commit 278 on fix/incident-handling by Nawoda0105 <Nawoda0105@users.noreply.github.com>
+Commit 829 on main by DGAIndeepa <DGAIndeepa@users.noreply.github.com>
+Commit 627 on fix/incident-handling by chamodmanubasha7 <chamodmanubasha7@users.noreply.github.com>
+Commit 281 on fix/incident-handling by sayumi2003 <sayumi2003@users.noreply.github.com>
+Commit 832 on feature/auth-system by chamodmanubasha7 <chamodmanubasha7@users.noreply.github.com>
+Commit 293 on fix/incident-handling by DGAIndeepa <DGAIndeepa@users.noreply.github.com>
+Commit 307 on fix/incident-handling by DGAIndeepa <DGAIndeepa@users.noreply.github.com>
+Commit 654 on fix/incident-handling by Nawoda0105 <Nawoda0105@users.noreply.github.com>
+Commit 865 on develop by chamodmanubasha7 <chamodmanubasha7@users.noreply.github.com>
+Commit 316 on fix/incident-handling by chamodmanubasha7 <chamodmanubasha7@users.noreply.github.com>
+Commit 658 on develop by chamodmanubasha7 <chamodmanubasha7@users.noreply.github.com>
+Commit 317 on fix/incident-handling by sayumi2003 <sayumi2003@users.noreply.github.com>
+Commit 659 on develop by sayumi2003 <sayumi2003@users.noreply.github.com>
+Commit 870 on feature/auth-system by chamodmanubasha7 <chamodmanubasha7@users.noreply.github.com>
+Commit 318 on feature/facility-mgmt by DGAIndeepa <DGAIndeepa@users.noreply.github.com>
+Commit 660 on fix/incident-handling by sayumi2003 <sayumi2003@users.noreply.github.com>
+Commit 703 on main by chamodmanubasha7 <chamodmanubasha7@users.noreply.github.com>
+Commit 914 on fix/incident-handling by DGAIndeepa <DGAIndeepa@users.noreply.github.com>
+Commit 3 on develop by Nawoda0105 <Nawoda0105@users.noreply.github.com>
+Commit 366 on develop by sayumi2003 <sayumi2003@users.noreply.github.com>
+Commit 4 on develop by DGAIndeepa <DGAIndeepa@users.noreply.github.com>
+Commit 719 on develop by Nawoda0105 <Nawoda0105@users.noreply.github.com>
+Commit 12 on develop by Nawoda0105 <Nawoda0105@users.noreply.github.com>
+Commit 930 on feature/notifications by Nawoda0105 <Nawoda0105@users.noreply.github.com>
+Commit 389 on develop by chamodmanubasha7 <chamodmanubasha7@users.noreply.github.com>
+Commit 42 on develop by chamodmanubasha7 <chamodmanubasha7@users.noreply.github.com>
+=======
 ﻿Commit 605 on feature/notifications by sayumi2003 <sayumi2003@users.noreply.github.com>
 Commit 86 on feature/auth-system by DGAIndeepa <DGAIndeepa@users.noreply.github.com>
 Commit 99 on feature/notifications by chamodmanubasha7 <chamodmanubasha7@users.noreply.github.com>
@@ -123,3 +154,8 @@ Commit 20 on feature/facility-mgmt by DGAIndeepa <DGAIndeepa@users.noreply.githu
 Commit 21 on feature/notifications by sayumi2003 <sayumi2003@users.noreply.github.com>
 Commit 384 on feature/notifications by sayumi2003 <sayumi2003@users.noreply.github.com>
 Commit 938 on main by DGAIndeepa <DGAIndeepa@users.noreply.github.com>
+Commit 44 on feature/notifications by DGAIndeepa <DGAIndeepa@users.noreply.github.com>
+>>>>>>> Stashed changes
+Commit 737 on feature/notifications by chamodmanubasha7 <chamodmanubasha7@users.noreply.github.com>
+Commit 45 on feature/notifications by Nawoda0105 <Nawoda0105@users.noreply.github.com>
+Commit 402 on main by Nawoda0105 <Nawoda0105@users.noreply.github.com>
