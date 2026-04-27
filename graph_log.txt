@@ -362,3 +362,5 @@ Commit 553 on fix/incident-handling by chamodmanubasha7 <chamodmanubasha7@users.
 Commit 768 on feature/facility-mgmt by sayumi2003 <sayumi2003@users.noreply.github.com>
 Commit 769 on fix/incident-handling by chamodmanubasha7 <chamodmanubasha7@users.noreply.github.com>
 Commit 215 on fix/incident-handling by sayumi2003 <sayumi2003@users.noreply.github.com>
+Commit 776 on feature/notifications by sayumi2003 <sayumi2003@users.noreply.github.com>
+Commit 222 on fix/incident-handling by sayumi2003 <sayumi2003@users.noreply.github.com>
