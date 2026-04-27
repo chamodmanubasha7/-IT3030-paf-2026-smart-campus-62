@@ -68,3 +68,5 @@ Commit 12 on fix/incident-handling by chamodmanubasha7 <chamodmanubasha7@users.n
 Commit 398 on fix/incident-handling by chamodmanubasha7 <chamodmanubasha7@users.noreply.github.com>
 Commit 416 on fix/incident-handling by DGAIndeepa <DGAIndeepa@users.noreply.github.com>
 Commit 425 on fix/incident-handling by DGAIndeepa <DGAIndeepa@users.noreply.github.com>
+Commit 794 on fix/incident-handling by sayumi2003 <sayumi2003@users.noreply.github.com>
+Commit 442 on feature/notifications by chamodmanubasha7 <chamodmanubasha7@users.noreply.github.com>
