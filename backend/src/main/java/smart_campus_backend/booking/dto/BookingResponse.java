@@ -1,0 +1,36 @@
+package smart_campus_backend.booking.dto;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import smart_campus_backend.booking.entity.BookingStatus;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class BookingResponse {
+    private String id;
+    private String userId;
+    private String userName;
+    private String resourceId;
+    private String resourceName;
+    private String resourceLocation;
+    private LocalDate date;
+    private LocalTime startTime;
+    private LocalTime endTime;
+    private String purpose;
+    private Integer attendees;
+    private BookingStatus status;
+    private String rejectionReason;
+    private Boolean capacityOverridden;
+    private String overrideReason;
+    private LocalDateTime waitlistedAt;
+    private LocalDateTime promotedAt;
+    private String lastActionBy;
+}

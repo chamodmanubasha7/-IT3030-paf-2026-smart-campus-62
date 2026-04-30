@@ -1,0 +1,74 @@
+package smart_campus_backend.notification.controller;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.web.bind.annotation.*;
+import smart_campus_backend.auth.entity.User;
+import smart_campus_backend.auth.repository.UserRepository;
+import smart_campus_backend.notification.dto.NotificationResponse;
+import smart_campus_backend.notification.entity.Notification;
+import smart_campus_backend.notification.entity.NotificationType;
+import smart_campus_backend.notification.service.NotificationService;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/notifications")
+@RequiredArgsConstructor
+@PreAuthorize("hasAnyRole('USER', 'TECHNICIAN', 'ADMIN', 'SUPER_ADMIN')")
+public class NotificationController {
+
+    private final NotificationService notificationService;
+    private final UserRepository userRepository;
+
+    @GetMapping
+    public ResponseEntity<List<NotificationResponse>> getMyNotifications(@AuthenticationPrincipal UserDetails userDetails) {
+        User user = getUserByEmail(userDetails);
+        List<NotificationResponse> payload = notificationService.getMyNotifications(user).stream()
+                .map(this::mapToResponse)
+                .toList();
+        return ResponseEntity.ok(payload);
+    }
+
+    @GetMapping("/unread-count")
+    public ResponseEntity<Long> getUnreadCount(@AuthenticationPrincipal UserDetails userDetails) {
+        User user = getUserByEmail(userDetails);
+        return ResponseEntity.ok(notificationService.getUnreadCount(user));
+    }
+
+    @PutMapping("/{id}/read")
+    public ResponseEntity<Void> markAsRead(@PathVariable String id) {
+        notificationService.markAsRead(id);
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/read-all")
+    public ResponseEntity<Void> markAllAsRead(@AuthenticationPrincipal UserDetails userDetails) {
+        User user = getUserByEmail(userDetails);
+        notificationService.markAllAsRead(user);
+        return ResponseEntity.ok().build();
+    }
+
+    private User getUserByEmail(UserDetails userDetails) {
+        if (userDetails == null) {
+            throw new UsernameNotFoundException("Authenticated user not found");
+        }
+        return userRepository.findByEmail(userDetails.getUsername())
+                .orElseThrow(() -> new UsernameNotFoundException("Authenticated user not found"));
+    }
+
+    private NotificationResponse mapToResponse(Notification notification) {
+        return NotificationResponse.builder()
+                .id(notification.getId())
+                .message(notification.getMessage())
+                .type(notification.getType() == null ? NotificationType.GENERAL : notification.getType())
+                .link(notification.getLink())
+                .isRead(notification.isRead())
+                .timestamp(notification.getTimestamp())
+                .build();
+    }
+}
