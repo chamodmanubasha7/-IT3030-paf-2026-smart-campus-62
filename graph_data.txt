@@ -1,4 +1,6 @@
 ﻿Work on main by RomeshG <romesh@example.com> at 30-Apr-26 10:55:00 PM
 Work on main by RomeshG <romesh@example.com> at 30-Apr-26 10:55:00 PM
 Work on main by RomeshG <romesh@example.com> at 30-Apr-26 10:55:01 PM
-Work on feature/ticketing by AnjanaShakuntha <anjana@example.com> at 30-Apr-26 10:55:02 PM
+Work on feature/module-e-auth by RomeshG <romesh@example.com> at 30-Apr-26 10:55:01 PM
+Work on feature/module-e-auth by RomeshG <romesh@example.com> at 30-Apr-26 10:55:01 PM
+Work on feature/module-e-auth by Romesh Gamadikari <romesh.g@example.com> at 30-Apr-26 10:55:02 PM
