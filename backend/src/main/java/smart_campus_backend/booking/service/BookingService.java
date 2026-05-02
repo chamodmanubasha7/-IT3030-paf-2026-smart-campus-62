@@ -220,7 +220,7 @@ public class BookingService {
         );
         notificationEmailService.sendNotificationEmail(
                 booking.getUser().getEmail(),
-                "Booking approved - Smart Campus",
+                "Booking approved - Smart Campus Operations Hub",
                 message + "\n\nOpen the app to view details."
         );
         return mapToResponse(saved);
@@ -251,7 +251,7 @@ public class BookingService {
         );
         notificationEmailService.sendNotificationEmail(
                 booking.getUser().getEmail(),
-                "Booking rejected - Smart Campus",
+                "Booking rejected - Smart Campus Operations Hub",
                 message + "\n\nOpen the app to view details."
         );
         return mapToResponse(saved);
@@ -286,7 +286,7 @@ public class BookingService {
         );
         notificationEmailService.sendNotificationEmail(
                 booking.getUser().getEmail(),
-                "Booking Approval Revoked - Smart Campus",
+                "Booking Approval Revoked - Smart Campus Operations Hub",
                 message + "\n\nOpen the app to view details."
         );
         
@@ -323,7 +323,7 @@ public class BookingService {
         );
         notificationEmailService.sendNotificationEmail(
                 booking.getUser().getEmail(),
-                "Booking cancelled - Smart Campus",
+                "Booking cancelled - Smart Campus Operations Hub",
                 message + "\n\nOpen the app to view details."
         );
         if (freedCapacity) {

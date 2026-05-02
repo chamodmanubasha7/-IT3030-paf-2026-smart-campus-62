@@ -51,7 +51,51 @@
     --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-:root, .dark {
+:root {
+    --background: #FFFFFF;
+    --foreground: #0F172A;
+    --card: #F8FAFC;
+    --card-foreground: #0F172A;
+    --popover: #FFFFFF;
+    --popover-foreground: #0F172A;
+    
+    --primary: #3B5BDB;
+    --primary-foreground: #FFFFFF;
+    
+    --secondary: #F1F5F9;
+    --secondary-foreground: #3B5BDB;
+    
+    --muted: #F1F5F9;
+    --muted-foreground: #64748B;
+    
+    --accent: #8B5CF6;
+    --accent-foreground: #FFFFFF;
+    
+    --destructive: #EF4444;
+    
+    --border: #E2E8F0;
+    --input: #E2E8F0;
+    --ring: #3B5BDB;
+    
+    --chart-1: #3B5BDB;
+    --chart-2: #10B981;
+    --chart-3: #06B6D4;
+    --chart-4: #F59E0B;
+    --chart-5: #EC4899;
+    
+    --radius: 0.75rem;
+    
+    --sidebar: #F8FAFC;
+    --sidebar-foreground: #0F172A;
+    --sidebar-primary: #3B5BDB;
+    --sidebar-primary-foreground: #FFFFFF;
+    --sidebar-accent: #E2E8F0;
+    --sidebar-accent-foreground: #3B5BDB;
+    --sidebar-border: #E2E8F0;
+    --sidebar-ring: #3B5BDB;
+}
+
+.dark {
     --background: #0F172A;
     --foreground: #F8FAFC;
     --card: #1E293B;
@@ -59,7 +103,6 @@
     --popover: #1E293B;
     --popover-foreground: #F8FAFC;
     
-    /* Primary Gradient Colors */
     --primary: #3B5BDB;
     --primary-foreground: #FFFFFF;
     
@@ -69,36 +112,28 @@
     --muted: #111827;
     --muted-foreground: #A9B8FF;
     
-    /* Purple Accent */
     --accent: #8B5CF6;
     --accent-foreground: #FFFFFF;
     
-    /* Error / Red */
     --destructive: #EF4444;
     
-    --border: #4F46E5;
-    --input: #3730A3;
-    
-    /* Bright Blue for focus rings */
+    --border: #334155;
+    --input: #334155;
     --ring: #818CF8;
     
-    /* Secondary Colors for charts/accents */
     --chart-1: #3B5BDB;
     --chart-2: #10B981;
     --chart-3: #06B6D4;
     --chart-4: #F59E0B;
     --chart-5: #EC4899;
     
-    --radius: 0.75rem;
-    
-    /* Sidebar matching the very dark blue */
     --sidebar: #111827;
     --sidebar-foreground: #F8FAFC;
     --sidebar-primary: #3B5BDB;
     --sidebar-primary-foreground: #FFFFFF;
-    --sidebar-accent: #2A1B3D;
+    --sidebar-accent: #1E293B;
     --sidebar-accent-foreground: #A9B8FF;
-    --sidebar-border: #3B235C;
+    --sidebar-border: #1E293B;
     --sidebar-ring: #5C7CFA;
 }
 
@@ -107,7 +142,7 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground transition-colors duration-300;
   }
   html {
     @apply font-sans;

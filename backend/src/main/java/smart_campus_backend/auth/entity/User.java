@@ -43,6 +43,18 @@ public class User {
     @Builder.Default
     private boolean enabled = true;
 
+    // Role-specific identifiers
+    private String studentId;
+    private String companyId;
+
+    // Extended profile details
+    private String department;
+    private String designation;
+    private String bio;
+    private String officeLocation;
+    private String emergencyContact;
+    private String socialLink;
+
     // Stores the Google sub (subject) ID for OAuth users
     private String providerId;
 }

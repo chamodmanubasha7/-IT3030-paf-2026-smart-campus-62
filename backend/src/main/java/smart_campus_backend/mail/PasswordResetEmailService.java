@@ -22,10 +22,10 @@ public class PasswordResetEmailService {
     public PasswordResetEmailService(
             @Autowired(required = false) JavaMailSender mailSender,
             @Value("${spring.mail.username:}") String mailUsername,
-            @Value("${app.mail.from-name:Smart Campus}") String configuredFromName) {
+            @Value("${app.mail.from-name:Smart Campus Operations Hub}") String configuredFromName) {
         this.mailSender = mailSender;
         this.fromAddress = mailUsername != null ? mailUsername.trim() : "";
-        this.fromName = configuredFromName != null ? configuredFromName.trim() : "Smart Campus";
+        this.fromName = configuredFromName != null ? configuredFromName.trim() : "Smart Campus Operations Hub";
     }
 
     public void sendPasswordReset(String toEmail, String resetUrl, long expirationMinutes) {
@@ -38,7 +38,7 @@ public class PasswordResetEmailService {
             var helper = new MimeMessageHelper(message, false, "UTF-8");
             helper.setFrom(fromAddress, fromName);
             helper.setTo(toEmail);
-            helper.setSubject("Smart Campus - Password reset");
+            helper.setSubject("Smart Campus Operations Hub - Password reset");
             helper.setText(buildResetHtml(resetUrl, expirationMinutes), true);
             mailSender.send(message);
         } catch (MailException | UnsupportedEncodingException | jakarta.mail.MessagingException ex) {
@@ -54,7 +54,7 @@ public class PasswordResetEmailService {
                 <head>
                   <meta charset="UTF-8"/>
                   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-                  <title>Smart Campus - Password Reset</title>
+                  <title>Smart Campus Operations Hub - Password Reset</title>
                 </head>
                 <body style="margin:0;padding:0;background:#f1f5f9;font-family:Arial,sans-serif;color:#0f172a;">
                   <table role="presentation" width="100%%" cellpadding="0" cellspacing="0" style="padding:24px 12px;">
@@ -63,7 +63,7 @@ public class PasswordResetEmailService {
                         <table role="presentation" width="100%%" cellpadding="0" cellspacing="0" style="max-width:640px;background:#ffffff;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;">
                           <tr>
                             <td style="padding:16px 20px;background:linear-gradient(90deg,#1d4ed8,#7c3aed);color:#ffffff;">
-                              <h1 style="margin:0;font-size:18px;line-height:1.3;">Smart Campus</h1>
+                              <h1 style="margin:0;font-size:18px;line-height:1.3;">Smart Campus Operations Hub</h1>
                               <p style="margin:4px 0 0 0;font-size:12px;opacity:0.9;">Password Reset</p>
                             </td>
                           </tr>
@@ -90,7 +90,7 @@ public class PasswordResetEmailService {
                                 If you did not request this, you can ignore this email.
                               </p>
                               <p style="margin:4px 0 0 0;font-size:12px;line-height:1.5;color:#94a3b8;">
-                                &copy; %d Smart Campus
+                                &copy; %d Smart Campus Operations Hub
                               </p>
                             </td>
                           </tr>

@@ -4,18 +4,21 @@ import api from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
 import toast from 'react-hot-toast';
 import Cropper from 'react-easy-crop';
-import { AppSidebar } from '@/components/app-sidebar';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Label } from '@/components/ui/label';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
-import { BookOpen, Building2, Copy, LifeBuoy, MoreHorizontal, ShieldCheck, BarChart3, Trash2 } from 'lucide-react';
-import { NotificationBell } from '../components/NotificationBell';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { 
+  BookOpen, Building2, Copy, LifeBuoy, MoreHorizontal, ShieldCheck, 
+  BarChart3, Trash2, Settings as SettingsIcon, User as UserIcon, 
+  Palette, Sun, Moon, Monitor, Search, Sparkles, ChevronRight, XCircle,
+  AlertCircle
+} from 'lucide-react';
 import { ADMIN_ROLES } from '@/constants/roles';
 import { MyBookingsPage } from '@/pages/MyBookingsPage';
 import { AdminBookingPage } from '@/pages/AdminBookingPage';
@@ -38,6 +41,11 @@ export default function DashboardPage() {
   const [search, setSearch] = useState('');
   const [roleFilter, setRoleFilter] = useState('ALL');
   const [statusFilter, setStatusFilter] = useState('ALL');
+  const [suggestions, setSuggestions] = useState([]);
+  const [settingsTab, setSettingsTab] = useState('profile');
+
+  // Theme State
+  const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'dark');
 
   const [invites, setInvites] = useState([]);
   const [inviteEmail, setInviteEmail] = useState('');
@@ -45,7 +53,22 @@ export default function DashboardPage() {
   const [inviteError, setInviteError] = useState('');
   const [inviteSubmitting, setInviteSubmitting] = useState(false);
   const [copiedInviteId, setCopiedInviteId] = useState(null);
-  const [profileForm, setProfileForm] = useState({ name: '', email: '', profileImageUrl: '' });
+  const [profileForm, setProfileForm] = useState({ 
+    name: '', 
+    email: '', 
+    profileImageUrl: '',
+    contactNo: '',
+    academicYear: '',
+    semester: '',
+    studentId: '',
+    companyId: '',
+    department: '',
+    designation: '',
+    bio: '',
+    officeLocation: '',
+    emergencyContact: '',
+    socialLink: ''
+  });
   const [profileLoading, setProfileLoading] = useState(false);
   const [profileSaving, setProfileSaving] = useState(false);
   const [profileUploading, setProfileUploading] = useState(false);
@@ -56,6 +79,33 @@ export default function DashboardPage() {
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
+
+  // Apply Theme
+  useEffect(() => {
+    const root = window.document.documentElement;
+    root.classList.remove('light', 'dark');
+    if (theme === 'system') {
+      const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      root.classList.add(systemTheme);
+    } else {
+      root.classList.add(theme);
+    }
+    localStorage.setItem('theme', theme);
+  }, [theme]);
+
+  // Suggestions logic for user management
+  useEffect(() => {
+    if (search.trim().length > 1 && users.length > 0) {
+      const query = search.toLowerCase();
+      const filtered = users
+        .filter(u => u.name.toLowerCase().includes(query) || u.email.toLowerCase().includes(query))
+        .map(u => u.name)
+        .slice(0, 5);
+      setSuggestions(filtered);
+    } else {
+      setSuggestions([]);
+    }
+  }, [search, users]);
 
   useEffect(() => {
     if (!isSuperAdmin) {
@@ -91,7 +141,6 @@ export default function DashboardPage() {
     if (!isSuperAdmin) return;
     if (!['user-management', 'admin-management', 'super-admin-management'].includes(activePage)) return;
     fetchUsers();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isSuperAdmin, activePage, search, roleFilter, statusFilter]);
 
   useEffect(() => {
@@ -113,6 +162,17 @@ export default function DashboardPage() {
         name: response?.data?.name || '',
         email: response?.data?.email || '',
         profileImageUrl: response?.data?.profileImageUrl || '',
+        contactNo: response?.data?.contactNo || '',
+        academicYear: response?.data?.academicYear || '',
+        semester: response?.data?.semester || '',
+        studentId: response?.data?.studentId || '',
+        companyId: response?.data?.companyId || '',
+        department: response?.data?.department || '',
+        designation: response?.data?.designation || '',
+        bio: response?.data?.bio || '',
+        officeLocation: response?.data?.officeLocation || '',
+        emergencyContact: response?.data?.emergencyContact || '',
+        socialLink: response?.data?.socialLink || '',
       });
     } catch (err) {
       setProfileError(err?.response?.data?.message || 'Failed to load your profile');
@@ -123,15 +183,29 @@ export default function DashboardPage() {
 
   const handleProfileSubmit = async (event) => {
     event.preventDefault();
+    
+    // Validations
     if (!profileForm.name.trim()) {
-      setProfileError('Name is required');
+      setProfileError('Full legal name is required');
+      toast.error('Name is required');
+      return;
+    }
+
+    if (profileForm.contactNo && !/^(?:\+94|0)?7[0-9]{8}$/.test(profileForm.contactNo)) {
+      setProfileError('Invalid contact number format (e.g. +94771234567)');
+      toast.error('Invalid contact number');
+      return;
+    }
+
+    if (user.role === 'USER' && profileForm.studentId && !/^[A-Z]{2}[0-9]{8}$/.test(profileForm.studentId)) {
+      setProfileError('Invalid Student ID format (e.g. IT21004567)');
       return;
     }
 
     setProfileSaving(true);
     setProfileError('');
     try {
-      await updateProfile(profileForm.name.trim(), profileForm.profileImageUrl.trim());
+      await updateProfile(profileForm);
       toast.success('Profile updated successfully');
     } catch (err) {
       setProfileError(err?.response?.data?.message || 'Failed to update profile');
@@ -140,81 +214,8 @@ export default function DashboardPage() {
     }
   };
 
-  const blobToFile = (blob, fileName) => new File([blob], fileName, { type: blob.type });
-
-  const canvasToBlob = (canvas, quality) =>
-    new Promise((resolve, reject) => {
-      canvas.toBlob(
-        (blob) => (blob ? resolve(blob) : reject(new Error('Failed to process image'))),
-        'image/jpeg',
-        quality
-      );
-    });
-
-  const compressImageUnder1MB = async (file, maxBytes = 1024 * 1024) => {
-    const imageBitmap = await createImageBitmap(file);
-    const maxDimension = 1200;
-    const scale = Math.min(1, maxDimension / Math.max(imageBitmap.width, imageBitmap.height));
-    const width = Math.max(1, Math.floor(imageBitmap.width * scale));
-    const height = Math.max(1, Math.floor(imageBitmap.height * scale));
-
-    const canvas = document.createElement('canvas');
-    canvas.width = width;
-    canvas.height = height;
-    const context = canvas.getContext('2d');
-    if (!context) throw new Error('Could not initialize image processing');
-
-    context.drawImage(imageBitmap, 0, 0, width, height);
-
-    let quality = 0.9;
-    let compressedBlob = await canvasToBlob(canvas, quality);
-    while (compressedBlob.size > maxBytes && quality > 0.4) {
-      quality -= 0.1;
-      compressedBlob = await canvasToBlob(canvas, quality);
-    }
-
-    if (compressedBlob.size > maxBytes) {
-      throw new Error('Unable to compress image under 1MB. Please use a smaller image.');
-    }
-
-    return blobToFile(compressedBlob, `${file.name.replace(/\.[^.]+$/, '') || 'profile'}-compressed.jpg`);
-  };
-
   const handleProfileImagePick = () => {
     profileImageInputRef.current?.click();
-  };
-
-  const createImage = (url) =>
-    new Promise((resolve, reject) => {
-      const image = new Image();
-      image.addEventListener('load', () => resolve(image));
-      image.addEventListener('error', (error) => reject(error));
-      image.setAttribute('crossOrigin', 'anonymous');
-      image.src = url;
-    });
-
-  const getCroppedImageFile = async (imageSrc, cropAreaPixels) => {
-    const image = await createImage(imageSrc);
-    const canvas = document.createElement('canvas');
-    canvas.width = cropAreaPixels.width;
-    canvas.height = cropAreaPixels.height;
-    const context = canvas.getContext('2d');
-    if (!context) throw new Error('Could not initialize image cropper');
-
-    context.drawImage(
-      image,
-      cropAreaPixels.x,
-      cropAreaPixels.y,
-      cropAreaPixels.width,
-      cropAreaPixels.height,
-      0,
-      0,
-      cropAreaPixels.width,
-      cropAreaPixels.height
-    );
-
-    const croppedBlob = await canvasToBlob(canvas, 0.95);
-    return blobToFile(croppedBlob, 'profile-cropped.jpg');
   };
 
   const handleProfileImageChange = async (event) => {
@@ -223,7 +224,7 @@ export default function DashboardPage() {
     if (!selected) return;
 
     if (!selected.type.startsWith('image/')) {
-      setProfileError('Please select a valid image file');
+      toast.error('Please select a valid image file');
       return;
     }
 
@@ -235,7 +236,7 @@ export default function DashboardPage() {
       setCroppedAreaPixels(null);
       setCropModalOpen(true);
     } catch (err) {
-      setProfileError(err?.message || 'Failed to load selected image');
+      toast.error('Failed to load selected image');
     }
   };
 
@@ -253,25 +254,39 @@ export default function DashboardPage() {
 
   const handleCroppedUpload = async () => {
     if (!cropSourceImage || !croppedAreaPixels) {
-      setProfileError('Please adjust crop area before uploading');
+      toast.error('Please adjust crop area before uploading');
       return;
     }
 
     setProfileUploading(true);
-    setProfileError('');
     try {
-      const croppedFile = await getCroppedImageFile(cropSourceImage, croppedAreaPixels);
-      const compressed = await compressImageUnder1MB(croppedFile);
-      const session = await uploadProfileImage(compressed);
+      // Helper functions defined inside component for simplicity or could be imported
+      const image = await new Promise((resolve, reject) => {
+        const img = new Image();
+        img.addEventListener('load', () => resolve(img));
+        img.addEventListener('error', (e) => reject(e));
+        img.setAttribute('crossOrigin', 'anonymous');
+        img.src = cropSourceImage;
+      });
+
+      const canvas = document.createElement('canvas');
+      canvas.width = croppedAreaPixels.width;
+      canvas.height = croppedAreaPixels.height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(image, croppedAreaPixels.x, croppedAreaPixels.y, croppedAreaPixels.width, croppedAreaPixels.height, 0, 0, croppedAreaPixels.width, croppedAreaPixels.height);
+      
+      const blob = await new Promise(res => canvas.toBlob(res, 'image/jpeg', 0.9));
+      const file = new File([blob], 'profile.jpg', { type: 'image/jpeg' });
+      
+      const session = await uploadProfileImage(file);
       setProfileForm((prev) => ({
         ...prev,
         profileImageUrl: session?.profileImageUrl || prev.profileImageUrl,
       }));
-      toast.success('Profile image uploaded');
+      toast.success('Profile image updated');
       closeCropModal();
     } catch (err) {
-      const fallback = err?.message || err?.response?.data?.message || 'Failed to upload profile image';
-      setProfileError(fallback);
+      toast.error('Failed to upload profile image');
     } finally {
       setProfileUploading(false);
     }
@@ -293,12 +308,11 @@ export default function DashboardPage() {
 
   const fetchInvites = async () => {
     setInviteLoading(true);
-    setInviteError('');
     try {
       const response = await api.get('/api/admin/invites');
       setInvites(response.data ?? []);
     } catch (err) {
-      setInviteError(err?.response?.data?.message || 'Failed to load invites');
+      toast.error('Failed to load invites');
     } finally {
       setInviteLoading(false);
     }
@@ -309,13 +323,13 @@ export default function DashboardPage() {
     const email = inviteEmail.trim();
     if (!email) return;
     setInviteSubmitting(true);
-    setInviteError('');
     try {
       await api.post('/api/admin/invites', { email });
       setInviteEmail('');
       await fetchInvites();
+      toast.success('Invite created');
     } catch (err) {
-      setInviteError(err?.response?.data?.message || 'Failed to create invite');
+      toast.error('Failed to create invite');
     } finally {
       setInviteSubmitting(false);
     }
@@ -326,8 +340,9 @@ export default function DashboardPage() {
       await navigator.clipboard.writeText(url);
       setCopiedInviteId(id);
       setTimeout(() => setCopiedInviteId(null), 2000);
+      toast.success('Link copied');
     } catch {
-      alert('Could not copy to clipboard');
+      toast.error('Failed to copy');
     }
   };
 
@@ -338,13 +353,12 @@ export default function DashboardPage() {
       toast.success('Invite deleted');
       await fetchInvites();
     } catch (err) {
-      setInviteError(err?.response?.data?.message || 'Failed to delete invite');
+      toast.error('Failed to delete invite');
     }
   };
 
   const fetchUsers = async () => {
     setLoading(true);
-    setError('');
     try {
       const params = {};
       if (activePage === 'admin-management') params.role = 'ADMIN';
@@ -356,15 +370,10 @@ export default function DashboardPage() {
       const response = await api.get('/api/admin/users', { params });
       setUsers(response.data ?? []);
     } catch (err) {
-      setError(err?.response?.data?.message || 'Failed to load users');
+      setError('Failed to load users');
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
   };
 
   const handleNavigate = (key) => {
@@ -372,7 +381,7 @@ export default function DashboardPage() {
       updateDashboardSectionParam('dashboard');
       return setActivePage('dashboard');
     }
-    if (key === 'catalogue') return navigate('/');
+    if (key === 'catalogue') return navigate('/resources');
     if (key === 'my-bookings' || key === 'bookings') {
       updateDashboardSectionParam('bookings');
       return setActivePage('bookings');
@@ -392,29 +401,12 @@ export default function DashboardPage() {
   };
 
   const openDashboardModule = (key) => {
-    if (key === 'catalogue') {
-      navigate('/');
-      return;
-    }
-    if (key === 'my-bookings') {
-      setActivePage('bookings');
-      return;
-    }
-    if (key === 'tickets') {
-      navigate(user?.role === 'USER' ? '/tickets/my' : '/tickets/manage');
-      return;
-    }
-    if (key === 'admin-bookings') {
-      setActivePage('manage-bookings');
-      return;
-    }
-    if (key === 'resource-management') {
-      setActivePage('resource-management');
-      return;
-    }
-    if (key === 'analytics') {
-      navigate('/admin/analytics');
-    }
+    if (key === 'catalogue') return navigate('/resources');
+    if (key === 'my-bookings') return setActivePage('bookings');
+    if (key === 'tickets') return navigate(user?.role === 'USER' ? '/tickets/my' : '/tickets/manage');
+    if (key === 'admin-bookings') return setActivePage('manage-bookings');
+    if (key === 'resource-management') return setActivePage('resource-management');
+    if (key === 'analytics') return navigate('/admin/analytics');
   };
 
   const handleBanToggle = async (target) => {
@@ -422,7 +414,7 @@ export default function DashboardPage() {
       await api.patch(`/api/admin/users/${target.id}/ban`, { banned: target.enabled });
       fetchUsers();
     } catch (err) {
-      alert(err?.response?.data?.message || 'Failed to update user status');
+      toast.error('Failed to update user status');
     }
   };
 
@@ -431,7 +423,7 @@ export default function DashboardPage() {
       await api.patch(`/api/admin/users/${target.id}/role`, { role: newRole });
       fetchUsers();
     } catch (err) {
-      alert(err?.response?.data?.message || 'Failed to update role');
+      toast.error('Failed to update role');
     }
   };
 
@@ -440,8 +432,9 @@ export default function DashboardPage() {
     try {
       await api.delete(`/api/admin/users/${target.id}`);
       fetchUsers();
+      toast.success('User deleted');
     } catch (err) {
-      alert(err?.response?.data?.message || 'Failed to delete user');
+      toast.error('Failed to delete user');
     }
   };
 
@@ -455,433 +448,526 @@ export default function DashboardPage() {
   );
 
   return (
-    <>
-      <div className="p-6 md:p-8 space-y-6">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold tracking-tight">
-          {activePage === 'user-management' && 'User Management'}
-          {activePage === 'admin-management' && 'Admin Management'}
-          {activePage === 'super-admin-management' && 'Super Admin Management'}
-          {activePage === 'admin-invites' && 'Admin Invites'}
-          {activePage === 'settings' && 'Profile Settings'}
-          {activePage === 'dashboard' && 'Dashboard'}
-          {activePage === 'bookings' && 'My Bookings'}
-          {activePage === 'resource-management' && 'Assets & Facilities'}
-          {activePage === 'manage-bookings' && 'Manage Bookings'}
-        </h1>
-      </div>
-          {activePage === 'settings' ? (
-            <Card>
-              <CardHeader>
-                <CardTitle>Edit profile</CardTitle>
-                <CardDescription>Keep your personal details and profile photo up to date.</CardDescription>
-              </CardHeader>
-              <CardContent>
-                {profileLoading ? (
-                  <p className="text-sm text-slate-500">Loading profile…</p>
-                ) : (
-                  <form className="space-y-6" onSubmit={handleProfileSubmit}>
-                    <div className="flex flex-col gap-5 rounded-lg border border-border bg-card p-4 md:flex-row md:items-center">
-                      <Avatar size="lg" className="size-20">
-                        <AvatarImage src={profileForm.profileImageUrl} alt={profileForm.name || 'User profile'} />
-                        <AvatarFallback>{(profileForm.name || 'U').slice(0, 1).toUpperCase()}</AvatarFallback>
-                      </Avatar>
-                      <div className="space-y-2">
-                        <p className="text-sm font-medium">Profile preview</p>
-                        <p className="text-sm text-muted-foreground">
-                          Upload your photo. It is auto-compressed to stay below 1MB before upload.
-                        </p>
-                        <div className="flex items-center gap-2">
-                          <Button type="button" variant="outline" onClick={handleProfileImagePick} disabled={profileUploading || profileSaving}>
-                            {profileUploading ? 'Uploading…' : 'Upload image'}
-                          </Button>
-                          {profileForm.profileImageUrl && (
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              onClick={() => setProfileForm((prev) => ({ ...prev, profileImageUrl: '' }))}
-                              disabled={profileUploading || profileSaving}
-                            >
-                              Remove
-                            </Button>
-                          )}
-                        </div>
-                        <input
-                          ref={profileImageInputRef}
-                          type="file"
-                          accept="image/*"
-                          className="hidden"
-                          onChange={handleProfileImageChange}
-                        />
-                      </div>
-                    </div>
+    <div className="min-h-screen bg-background">
+      <div className="p-6 md:p-8 space-y-8 max-w-[1600px] mx-auto animate-in fade-in duration-500">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="space-y-1">
+            <h1 className="text-3xl font-black tracking-tight text-foreground">
+              {activePage === 'user-management' && 'User Directory'}
+              {activePage === 'admin-management' && 'Admin Hub'}
+              {activePage === 'super-admin-management' && 'System Authority'}
+              {activePage === 'admin-invites' && 'Security Invitations'}
+              {activePage === 'settings' && 'Global Settings'}
+              {activePage === 'dashboard' && 'Operations Dashboard'}
+              {activePage === 'bookings' && 'My Schedule'}
+              {activePage === 'resource-management' && 'Asset Management'}
+              {activePage === 'manage-bookings' && 'Booking Control'}
+            </h1>
+            <p className="text-muted-foreground text-sm font-medium">
+              Smart Campus Operations Hub — Management Interface
+            </p>
+          </div>
+        </div>
 
-                    <Separator />
-
-                    <div className="grid gap-4 md:grid-cols-2">
-                      <div className="space-y-2">
-                        <Label htmlFor="profile-name">Full name</Label>
-                        <Input
-                          id="profile-name"
-                          value={profileForm.name}
-                          onChange={(event) =>
-                            setProfileForm((prev) => ({
-                              ...prev,
-                              name: event.target.value,
-                            }))
-                          }
-                          placeholder="Your full name"
-                          disabled={profileSaving}
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="profile-email">Email address</Label>
-                        <Input
-                          id="profile-email"
-                          type="email"
-                          value={profileForm.email}
-                          readOnly
-                          disabled
-                        />
-                        <p className="text-xs text-muted-foreground">
-                          Email is locked because it is a key account identifier.
-                        </p>
-                      </div>
-                    </div>
-
-                    {profileError && <p className="text-sm text-destructive">{profileError}</p>}
-                    <div className="flex items-center gap-3">
-                      <Button type="submit" disabled={profileSaving}>
-                        {profileSaving ? 'Saving…' : 'Save changes'}
-                      </Button>
-                      <Button type="button" variant="outline" onClick={fetchProfile} disabled={profileSaving}>
-                        Reset
-                      </Button>
-                    </div>
-                  </form>
-                )}
-              </CardContent>
-            </Card>
-          ) : isSuperAdmin && activePage === 'admin-invites' ? (
-            <div className="space-y-6">
-              <Card>
+        {activePage === 'settings' ? (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Left Col: Navigation / Info */}
+            <div className="lg:col-span-1 space-y-6">
+              <Card className="bg-card border-border shadow-xl shadow-primary/5">
                 <CardHeader>
-                  <CardTitle>Invite a new admin</CardTitle>
-                  <CardDescription>
-                    Sends an email with the signup link (if Gmail SMTP is configured). You can also copy the link below after creating an invite.
-                  </CardDescription>
+                  <CardTitle className="text-lg font-bold flex items-center gap-2">
+                    <SettingsIcon className="size-5 text-primary" /> Configuration
+                  </CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <form onSubmit={handleCreateInvite} className="flex flex-col gap-3 sm:flex-row sm:items-end">
-                    <div className="flex-1 space-y-2">
-                      <label htmlFor="invite-email" className="text-sm font-medium">
-                        Email
-                      </label>
-                      <Input
-                        id="invite-email"
-                        type="email"
-                        autoComplete="email"
-                        placeholder="future.admin@university.edu"
-                        value={inviteEmail}
-                        onChange={(e) => setInviteEmail(e.target.value)}
-                        disabled={inviteSubmitting}
-                      />
-                    </div>
-                    <Button type="submit" disabled={inviteSubmitting || !inviteEmail.trim()}>
-                      {inviteSubmitting ? 'Sending…' : 'Create invite'}
-                    </Button>
-                  </form>
-                  {inviteError && <p className="mt-3 text-sm text-destructive">{inviteError}</p>}
+                <CardContent className="p-0">
+                  <div className="space-y-1">
+                    <button 
+                      onClick={() => setSettingsTab('profile')}
+                      className={`w-full flex items-center gap-3 px-6 py-4 text-sm transition-all border-l-4 ${
+                        settingsTab === 'profile' 
+                          ? 'font-bold border-primary bg-primary/5 text-primary' 
+                          : 'font-medium text-muted-foreground hover:bg-muted/50 border-transparent'
+                      }`}
+                    >
+                      <UserIcon className="size-4" /> Account Profile
+                    </button>
+                    <button 
+                      onClick={() => setSettingsTab('appearance')}
+                      className={`w-full flex items-center gap-3 px-6 py-4 text-sm transition-all border-l-4 ${
+                        settingsTab === 'appearance' 
+                          ? 'font-bold border-primary bg-primary/5 text-primary' 
+                          : 'font-medium text-muted-foreground hover:bg-muted/50 border-transparent'
+                      }`}
+                    >
+                      <Palette className="size-4" /> Interface Appearance
+                    </button>
+                  </div>
                 </CardContent>
               </Card>
 
-              <Card>
-                <CardHeader>
-                  <CardTitle>Pending and past invites</CardTitle>
-                  <CardDescription>Status and invite links for onboarding.</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  {inviteLoading ? (
-                    <p className="text-sm text-slate-500">Loading invites…</p>
-                  ) : (
-                    <table className="w-full border-collapse text-left text-sm text-slate-700 dark:text-slate-300">
-                      <thead>
-                        <tr className="border-b border-slate-200 dark:border-slate-800">
-                          <th className="py-2">Email</th>
-                          <th className="py-2">Role</th>
-                          <th className="py-2">Status</th>
-                          <th className="py-2">Expires</th>
-                          <th className="py-2">Link</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {invites.length === 0 ? (
-                          <tr>
-                            <td colSpan={5} className="py-6 text-center text-slate-500 dark:text-slate-400">
-                              No invites yet. Create one above.
-                            </td>
-                          </tr>
-                        ) : (
-                          invites.map((inv) => (
-                            <tr key={inv.id} className="border-b border-slate-100 dark:border-slate-800">
-                              <td className="py-2">{inv.email}</td>
-                              <td className="py-2">
-                                <Badge variant="outline">{inv.targetRole}</Badge>
-                              </td>
-                              <td className="py-2">
-                                <Badge variant={inv.status === 'PENDING' ? 'secondary' : 'outline'}>{inv.status}</Badge>
-                              </td>
-                              <td className="py-2 text-xs text-slate-600 dark:text-slate-400">
-                                {inv.expiresAt
-                                  ? new Date(inv.expiresAt).toLocaleString(undefined, {
-                                      dateStyle: 'medium',
-                                      timeStyle: 'short',
-                                    })
-                                  : '—'}
-                              </td>
-                              <td className="py-2">
-                                <div className="flex items-center gap-2">
-                                  <span className="max-w-[180px] truncate font-mono text-xs text-slate-600 dark:text-slate-400" title={inv.inviteUrl}>
-                                    {inv.inviteUrl}
-                                  </span>
-                                  <Button
-                                    type="button"
-                                    variant="outline"
-                                    size="icon"
-                                    className="shrink-0"
-                                    onClick={() => copyInviteLink(inv.id, inv.inviteUrl)}
-                                    title="Copy link"
-                                  >
-                                    <Copy className="size-4" />
-                                  </Button>
-                                  {copiedInviteId === inv.id && (
-                                    <span className="text-xs text-emerald-600">Copied</span>
-                                  )}
-                                  <Button
-                                    type="button"
-                                    variant="destructive"
-                                    size="icon"
-                                    className="shrink-0"
-                                    onClick={() => handleDeleteInvite(inv)}
-                                    title="Delete invite"
-                                  >
-                                    <Trash2 className="size-4" />
-                                  </Button>
-                                </div>
-                              </td>
-                            </tr>
-                          ))
-                        )}
-                      </tbody>
-                    </table>
-                  )}
-                </CardContent>
-              </Card>
-            </div>
-          ) : isSuperAdmin && ['user-management', 'admin-management', 'super-admin-management'].includes(activePage) ? (
-            <>
-              {activePage === 'user-management' && (
-                <div className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-4">
-                  {ROLE_OPTIONS.map((currentRole) => (
-                    <Card key={currentRole}>
-                      <CardHeader className="pb-2">
-                        <CardDescription>{currentRole} count</CardDescription>
-                      </CardHeader>
-                      <CardContent>
-                        <CardTitle className="text-2xl">{roleCounts[currentRole] || 0}</CardTitle>
-                      </CardContent>
-                    </Card>
-                  ))}
+              <div className="p-6 rounded-2xl bg-primary/5 border border-primary/10">
+                <div className="flex items-center gap-2 text-primary font-black uppercase text-[10px] tracking-widest mb-3">
+                  <Sparkles className="size-3.5" /> Pro Tip
                 </div>
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  Toggle between Light and Dark modes to optimize your workspace environment for day or night operations.
+                </p>
+              </div>
+            </div>
+
+            {/* Right Col: Forms */}
+            <div className="lg:col-span-2 space-y-8">
+              {settingsTab === 'profile' && (
+                <Card className="bg-card border-border shadow-xl animate-in fade-in slide-in-from-right-4 duration-500">
+                  <CardHeader className="border-b border-border/50 pb-6">
+                    <CardTitle className="text-xl font-black">Personal Identity</CardTitle>
+                    <CardDescription>Update your public-facing profile and contact information.</CardDescription>
+                  </CardHeader>
+                  <CardContent className="pt-8">
+                    {profileLoading ? (
+                      <div className="flex justify-center py-10"><div className="size-8 border-4 border-primary/20 border-t-primary rounded-full animate-spin" /></div>
+                    ) : (
+                      <form className="space-y-8" onSubmit={handleProfileSubmit}>
+                        {profileError && (
+                          <Alert variant="destructive" className="bg-rose-500/10 border-rose-500/20 text-rose-500">
+                            <AlertCircle className="size-4" />
+                            <AlertDescription className="font-bold">{profileError}</AlertDescription>
+                          </Alert>
+                        )}
+                        <div className="flex flex-col md:flex-row items-start md:items-center gap-8">
+                          <div className="relative group">
+                            <Avatar className="size-28 border-4 border-primary/20 ring-4 ring-background">
+                              <AvatarImage src={profileForm.profileImageUrl} alt={profileForm.name} />
+                              <AvatarFallback className="bg-primary/10 text-primary text-3xl font-black">
+                                {(profileForm.name || 'U').slice(0, 1).toUpperCase()}
+                              </AvatarFallback>
+                            </Avatar>
+                            <Button 
+                              type="button" 
+                              variant="secondary" 
+                              size="icon" 
+                              className="absolute -bottom-2 -right-2 size-8 rounded-full shadow-lg border border-border"
+                              onClick={handleProfileImagePick}
+                            >
+                              <Copy className="size-3.5" />
+                            </Button>
+                          </div>
+                          <div className="space-y-2 flex-1">
+                            <h4 className="text-sm font-black uppercase tracking-widest text-muted-foreground">Profile Image</h4>
+                            <p className="text-xs text-muted-foreground leading-relaxed max-w-md">
+                              Recommended: Square image, 400x400px. Maximum size 1MB. Our system will auto-optimize your upload.
+                            </p>
+                            <input ref={profileImageInputRef} type="file" accept="image/*" className="hidden" onChange={handleProfileImageChange} />
+                          </div>
+                        </div>
+
+                        <Separator className="bg-border/50" />
+
+                        <div className="grid gap-6 md:grid-cols-2">
+                          <div className="space-y-2">
+                            <Label htmlFor="p-name" className="text-xs font-black uppercase tracking-wider text-muted-foreground">Full Legal Name</Label>
+                            <Input 
+                              id="p-name" 
+                              value={profileForm.name} 
+                              onChange={e => setProfileForm(p => ({...p, name: e.target.value}))}
+                              className="bg-muted/30 border-border focus:ring-primary h-11"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="p-email" className="text-xs font-black uppercase tracking-wider text-muted-foreground">Email Address</Label>
+                            <Input 
+                              id="p-email" 
+                              value={profileForm.email} 
+                              readOnly 
+                              className="bg-muted/10 border-border/50 text-muted-foreground cursor-not-allowed h-11"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                          {user.role === 'USER' && (
+                            <div className="space-y-2">
+                              <Label htmlFor="p-studentId" className="text-xs font-black uppercase tracking-wider text-muted-foreground">Student ID</Label>
+                              <Input 
+                                id="p-studentId" 
+                                value={profileForm.studentId} 
+                                onChange={e => setProfileForm(p => ({...p, studentId: e.target.value}))}
+                                className="bg-muted/30 border-border h-11"
+                                placeholder="e.g. IT21004567"
+                              />
+                            </div>
+                          )}
+                          {(user.role === 'ADMIN' || user.role === 'SUPER_ADMIN') && (
+                            <div className="space-y-2">
+                              <Label htmlFor="p-companyId" className="text-xs font-black uppercase tracking-wider text-muted-foreground">Staff / Company ID</Label>
+                              <Input 
+                                id="p-companyId" 
+                                value={profileForm.companyId} 
+                                onChange={e => setProfileForm(p => ({...p, companyId: e.target.value}))}
+                                className="bg-muted/30 border-border h-11"
+                                placeholder="e.g. STF-8829"
+                              />
+                            </div>
+                          )}
+                          <div className="space-y-2">
+                            <Label htmlFor="p-contact" className="text-xs font-black uppercase tracking-wider text-muted-foreground">Contact Number</Label>
+                            <Input 
+                              id="p-contact" 
+                              value={profileForm.contactNo} 
+                              onChange={e => setProfileForm(p => ({...p, contactNo: e.target.value}))}
+                              className="bg-muted/30 border-border h-11"
+                              placeholder="+94 77 123 4567"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="p-dept" className="text-xs font-black uppercase tracking-wider text-muted-foreground">Department / Faculty</Label>
+                            <Input 
+                              id="p-dept" 
+                              value={profileForm.department} 
+                              onChange={e => setProfileForm(p => ({...p, department: e.target.value}))}
+                              className="bg-muted/30 border-border h-11"
+                              placeholder="e.g. Computing"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="p-desig" className="text-xs font-black uppercase tracking-wider text-muted-foreground">Designation</Label>
+                            <Input 
+                              id="p-desig" 
+                              value={profileForm.designation} 
+                              onChange={e => setProfileForm(p => ({...p, designation: e.target.value}))}
+                              className="bg-muted/30 border-border h-11"
+                              placeholder="e.g. Senior Lecturer"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="p-office" className="text-xs font-black uppercase tracking-wider text-muted-foreground">Office / Room Location</Label>
+                            <Input 
+                              id="p-office" 
+                              value={profileForm.officeLocation} 
+                              onChange={e => setProfileForm(p => ({...p, officeLocation: e.target.value}))}
+                              className="bg-muted/30 border-border h-11"
+                              placeholder="e.g. Block A, Room 302"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="p-emergency" className="text-xs font-black uppercase tracking-wider text-muted-foreground">Emergency Contact</Label>
+                            <Input 
+                              id="p-emergency" 
+                              value={profileForm.emergencyContact} 
+                              onChange={e => setProfileForm(p => ({...p, emergencyContact: e.target.value}))}
+                              className="bg-muted/30 border-border h-11"
+                              placeholder="Contact person & number"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="p-social" className="text-xs font-black uppercase tracking-wider text-muted-foreground">Social Link / Portfolio</Label>
+                            <Input 
+                              id="p-social" 
+                              value={profileForm.socialLink} 
+                              onChange={e => setProfileForm(p => ({...p, socialLink: e.target.value}))}
+                              className="bg-muted/30 border-border h-11"
+                              placeholder="https://linkedin.com/in/..."
+                            />
+                          </div>
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label htmlFor="p-bio" className="text-xs font-black uppercase tracking-wider text-muted-foreground">Short Biography</Label>
+                          <textarea 
+                            id="p-bio" 
+                            rows={3}
+                            value={profileForm.bio} 
+                            onChange={e => setProfileForm(p => ({...p, bio: e.target.value}))}
+                            className="w-full rounded-md bg-muted/30 border border-border p-3 text-sm focus:ring-primary focus:outline-none"
+                            placeholder="Tell us about yourself..."
+                          />
+                        </div>
+
+                        <div className="flex justify-end pt-4">
+                          <Button type="submit" className="bg-primary hover:bg-primary/90 font-bold px-8 h-11" disabled={profileSaving}>
+                            {profileSaving ? 'Synchronizing...' : 'Update Profile'}
+                          </Button>
+                        </div>
+                      </form>
+                    )}
+                  </CardContent>
+                </Card>
               )}
 
-              <Card>
-                <CardHeader className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-                  <div>
-                    <CardTitle>
-                      {activePage === 'user-management' ? 'All Registered Users' : activePage === 'admin-management' ? 'Admins' : 'Super Admins'}
-                    </CardTitle>
-                    <CardDescription>Manage account status, roles, and lifecycle.</CardDescription>
-                  </div>
-                  <div className="flex w-full flex-col gap-2 md:w-auto md:flex-row">
-                    <Input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search by name or email" className="md:w-72" />
-                    {activePage === 'user-management' && (
-                      <select className="rounded-md border border-input bg-background px-3 py-2" value={roleFilter} onChange={(event) => setRoleFilter(event.target.value)}>
-                        <option value="ALL">All Roles</option>
-                        {ROLE_OPTIONS.map((option) => (
-                          <option key={option} value={option}>
-                            {option}
-                          </option>
+              {/* Theme Settings Card */}
+              {settingsTab === 'appearance' && (
+                <Card className="bg-card border-border shadow-xl animate-in fade-in slide-in-from-right-4 duration-500">
+                  <CardHeader className="border-b border-border/50 pb-6">
+                    <CardTitle className="text-xl font-black">Interface Appearance</CardTitle>
+                    <CardDescription>Customize how the Smart Campus Operations Hub looks on your device.</CardDescription>
+                  </CardHeader>
+                  <CardContent className="pt-8">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      {[
+                        { id: 'light', label: 'Light Mode', icon: Sun, desc: 'Clean and bright' },
+                        { id: 'dark', label: 'Dark Mode', icon: Moon, desc: 'Optimized for night' },
+                        { id: 'system', label: 'System Sync', icon: Monitor, desc: 'Matches your device' }
+                      ].map((mode) => (
+                        <button
+                          key={mode.id}
+                          onClick={() => setTheme(mode.id)}
+                          className={`flex flex-col items-center gap-4 p-6 rounded-2xl border-2 transition-all group ${
+                            theme === mode.id 
+                              ? 'border-primary bg-primary/5 ring-4 ring-primary/10' 
+                              : 'border-border bg-muted/20 hover:border-border/80'
+                          }`}
+                        >
+                          <div className={`p-3 rounded-xl transition-all ${
+                            theme === mode.id ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'bg-background text-muted-foreground group-hover:scale-110'
+                          }`}>
+                            <mode.icon className="size-6" />
+                          </div>
+                          <div className="text-center">
+                            <p className={`font-black text-sm ${theme === mode.id ? 'text-primary' : 'text-foreground'}`}>{mode.label}</p>
+                            <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-widest mt-1">{mode.desc}</p>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+          </div>
+        ) : isSuperAdmin && ['user-management', 'admin-management', 'super-admin-management'].includes(activePage) ? (
+          <div className="space-y-8">
+            {activePage === 'user-management' && (
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-4">
+                {ROLE_OPTIONS.map((c) => (
+                  <Card key={c} className="bg-card border-border shadow-lg hover:border-primary/30 transition-all">
+                    <CardHeader className="pb-2">
+                      <CardDescription className="text-[10px] font-black uppercase tracking-widest">{c} VOLUME</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <CardTitle className="text-3xl font-black text-foreground">{roleCounts[c] || 0}</CardTitle>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+
+            <Card className="bg-card border-border shadow-2xl overflow-hidden">
+              <CardHeader className="border-b border-border/50 bg-muted/20 p-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <div className="space-y-1">
+                  <CardTitle className="text-2xl font-black">
+                    {activePage === 'user-management' ? 'Directory Master' : activePage === 'admin-management' ? 'Administrative Tier' : 'Authority Control'}
+                  </CardTitle>
+                  <CardDescription className="text-sm font-medium">Managing access privileges and security protocols.</CardDescription>
+                </div>
+                
+                <div className="flex flex-col md:flex-row gap-4 items-end">
+                  <div className="relative group w-full md:w-80">
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 size-4 text-muted-foreground group-focus-within:text-blue-500 transition-colors" />
+                    <Input 
+                      placeholder="Search accounts..." 
+                      className="pl-11 bg-white dark:bg-slate-900 border-border/50 h-12 rounded-2xl focus:ring-blue-500 shadow-xl"
+                      value={search}
+                      onChange={e => setSearch(e.target.value)}
+                    />
+                    {/* Suggestions UI */}
+                    {suggestions.length > 0 && (
+                      <div className="absolute top-full left-0 w-full mt-2 bg-popover border border-border rounded-xl shadow-2xl z-50 overflow-hidden animate-in slide-in-from-top-2">
+                        {suggestions.map((s, i) => (
+                          <button 
+                            key={i} 
+                            className="w-full text-left px-4 py-3 text-sm hover:bg-muted flex items-center justify-between group"
+                            onClick={() => { setSearch(s); setSuggestions([]); }}
+                          >
+                            <span className="font-medium text-foreground">{s}</span>
+                            <ChevronRight className="size-3.5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                          </button>
                         ))}
-                      </select>
+                      </div>
                     )}
-                    <select className="rounded-md border border-input bg-background px-3 py-2" value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)}>
+                  </div>
+                  
+                  <div className="flex gap-2 w-full md:w-auto">
+                    <select 
+                      className="h-12 rounded-2xl border border-border bg-white dark:bg-slate-900 px-4 text-[10px] font-black uppercase tracking-widest text-muted-foreground focus:ring-blue-500 outline-none transition-all shadow-xl"
+                      value={roleFilter}
+                      onChange={e => setRoleFilter(e.target.value)}
+                    >
+                      <option value="ALL">All Roles</option>
+                      {ROLE_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}
+                    </select>
+                    <select 
+                      className="h-12 rounded-2xl border border-border bg-white dark:bg-slate-900 px-4 text-[10px] font-black uppercase tracking-widest text-muted-foreground focus:ring-blue-500 outline-none transition-all shadow-xl"
+                      value={statusFilter}
+                      onChange={e => setStatusFilter(e.target.value)}
+                    >
                       <option value="ALL">All Status</option>
                       <option value="ACTIVE">Active</option>
                       <option value="BANNED">Banned</option>
                     </select>
                   </div>
-                </CardHeader>
-                <CardContent>
-                  {error && <p className="mb-3 text-sm text-destructive">{error}</p>}
-                  {loading ? (
-                    <p className="text-sm text-slate-500">Loading users...</p>
-                  ) : (
-                    <table className="w-full border-collapse text-left text-sm text-slate-700 dark:text-slate-300">
-                      <thead>
-                        <tr className="border-b border-slate-200 dark:border-slate-800">
-                          <th className="py-2">Name</th>
-                          <th className="py-2">Email</th>
-                          <th className="py-2">Role</th>
-                          <th className="py-2">Status</th>
-                          <th className="py-2">Actions</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {users.map((item) => (
-                          <tr key={item.id} className="border-b border-slate-100 dark:border-slate-800">
-                            <td className="py-2">{item.name}</td>
-                            <td className="py-2">{item.email}</td>
-                            <td className="py-2">
-                              <Badge variant="outline">{item.role}</Badge>
-                            </td>
-                            <td className="py-2">
-                              <Badge variant={item.enabled ? 'secondary' : 'destructive'}>
-                                {item.enabled ? 'ACTIVE' : 'BANNED'}
-                              </Badge>
-                            </td>
-                            <td className="py-2">
+                </div>
+              </CardHeader>
+              <CardContent className="p-0">
+                <div className="overflow-x-auto">
+                  <table className="w-full border-collapse text-left text-sm">
+                    <thead>
+                      <tr className="bg-muted/10 border-b border-border/50">
+                        <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-muted-foreground">User Entity</th>
+                        <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-muted-foreground">Access Role</th>
+                        <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-muted-foreground">Status</th>
+                        <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-muted-foreground text-right">Operations</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-border/30">
+                      {loading ? (
+                        <tr><td colSpan={4} className="px-8 py-20 text-center text-muted-foreground font-medium italic">Synchronizing directory records...</td></tr>
+                      ) : users.length === 0 ? (
+                        <tr><td colSpan={4} className="px-8 py-20 text-center text-muted-foreground font-medium italic">No entities match current security filter.</td></tr>
+                      ) : (
+                        users.map((u) => (
+                          <tr key={u.id} className="hover:bg-primary/5 transition-colors group">
+                        <td className="px-8 py-5">
+                          <div className="flex items-center gap-4">
+                            <Avatar className="size-11 border border-border shadow-lg">
+                              <AvatarImage src={u.profileImageUrl} />
+                              <AvatarFallback className="bg-blue-500/10 text-blue-500 font-black text-xs">{(u.name || 'U').slice(0, 1)}</AvatarFallback>
+                            </Avatar>
+                            <div className="space-y-0.5">
+                              <p className="font-black text-slate-900 dark:text-slate-100">{u.name}</p>
+                              <p className="text-xs font-medium text-muted-foreground">{u.email}</p>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-8 py-5">
+                          <Badge variant="outline" className="font-black border-blue-500/20 text-blue-500 bg-blue-500/5 px-3 py-1 text-[10px] uppercase tracking-widest">
+                            {u.role}
+                          </Badge>
+                        </td>
+                        <td className="px-8 py-5">
+                          <div className="flex items-center gap-2">
+                            <div className={`size-2 rounded-full ${u.enabled ? 'bg-emerald-500 animate-pulse' : 'bg-rose-500'}`} />
+                            <span className={`text-[10px] font-black uppercase tracking-widest ${u.enabled ? 'text-emerald-500' : 'text-rose-500'}`}>
+                              {u.enabled ? 'Operational' : 'Suspended'}
+                            </span>
+                          </div>
+                        </td>
+                            <td className="px-8 py-4 text-right">
                               <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
-                                  <Button variant="outline" size="icon">
-                                    <MoreHorizontal className="size-4" />
+                                  <Button variant="ghost" size="icon" className="hover:bg-primary/10">
+                                    <MoreHorizontal className="size-4 text-muted-foreground" />
                                   </Button>
                                 </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end">
-                                  <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                  <DropdownMenuItem onClick={() => handleBanToggle(item)}>
-                                    {item.enabled ? 'Ban User' : 'Unban User'}
+                                <DropdownMenuContent align="end" className="w-56 border-border bg-popover">
+                                  <DropdownMenuLabel className="text-xs font-black uppercase tracking-widest">Authority Actions</DropdownMenuLabel>
+                                  <DropdownMenuItem onClick={() => handleBanToggle(u)} className="font-medium">
+                                    {u.enabled ? 'Suspend Access' : 'Restore Access'}
                                   </DropdownMenuItem>
                                   <DropdownMenuSeparator />
-                                  {ROLE_OPTIONS.map((option) => (
-                                    <DropdownMenuItem key={`${item.id}-${option}`} onClick={() => handleRoleChange(item, option)}>
-                                      Set role: {option}
+                                  {ROLE_OPTIONS.map(o => (
+                                    <DropdownMenuItem key={o} onClick={() => handleRoleChange(u, o)} className="text-xs font-bold">
+                                      Promote to {o}
                                     </DropdownMenuItem>
                                   ))}
                                   <DropdownMenuSeparator />
-                                  <DropdownMenuItem className="text-destructive" onClick={() => handleDelete(item)}>
-                                    Delete User
+                                  <DropdownMenuItem className="text-rose-500 font-bold" onClick={() => handleDelete(u)}>
+                                    Purge Record
                                   </DropdownMenuItem>
                                 </DropdownMenuContent>
                               </DropdownMenu>
                             </td>
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  )}
-                </CardContent>
-              </Card>
-            </>
-          ) : activePage === 'bookings' ? (
-            <MyBookingsPage embedded />
-          ) : activePage === 'resource-management' ? (
-            <AdminResourceManagementPage embedded />
-          ) : activePage === 'manage-bookings' ? (
-            <AdminBookingPage embedded />
-          ) : (
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-              <Card className="cursor-pointer" onClick={() => openDashboardModule('catalogue')}>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2"><Building2 className="size-5" /> Catalogue</CardTitle>
-                  <CardDescription>Browse facilities and assets.</CardDescription>
-                </CardHeader>
-              </Card>
-              <Card className="cursor-pointer" onClick={() => openDashboardModule('my-bookings')}>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2"><BookOpen className="size-5" /> My Bookings</CardTitle>
-                  <CardDescription>Track and manage your bookings.</CardDescription>
-                </CardHeader>
-              </Card>
-              <Card className="cursor-pointer" onClick={() => openDashboardModule('tickets')}>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2"><LifeBuoy className="size-5" /> Tickets</CardTitle>
-                  <CardDescription>Create and follow maintenance tickets.</CardDescription>
-                </CardHeader>
-              </Card>
-              {ADMIN_ROLES.includes(role) && (
-                <Card className="cursor-pointer" onClick={() => openDashboardModule('resource-management')}>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2"><Building2 className="size-5" /> Assets & Facilities</CardTitle>
-                    <CardDescription>View and manage all campus resources from dashboard.</CardDescription>
-                  </CardHeader>
-                </Card>
-              )}
-              {ADMIN_ROLES.includes(role) && (
-                <Card className="cursor-pointer" onClick={() => openDashboardModule('admin-bookings')}>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2"><ShieldCheck className="size-5" /> Manage Bookings</CardTitle>
-                    <CardDescription>Approve and reject booking requests.</CardDescription>
-                  </CardHeader>
-                </Card>
-              )}
-              {ADMIN_ROLES.includes(role) && (
-                <Card className="cursor-pointer" onClick={() => openDashboardModule('analytics')}>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2"><BarChart3 className="size-5" /> Analytics</CardTitle>
-                    <CardDescription>View booking and usage insights.</CardDescription>
-                  </CardHeader>
-                </Card>
-              )}
-            </div>
-          )}
-        </div>
-        {cropModalOpen && cropSourceImage && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/65 p-4">
-            <div className="w-full max-w-2xl rounded-xl bg-background shadow-2xl">
-              <div className="border-b px-6 py-4">
-                <h3 className="text-lg font-semibold">Crop profile picture</h3>
-                <p className="text-sm text-muted-foreground">Choose the area you want to upload.</p>
-              </div>
-              <div className="space-y-4 p-6">
-                <div className="relative h-[360px] w-full overflow-hidden rounded-md bg-black">
-                  <Cropper
-                    image={cropSourceImage}
-                    crop={crop}
-                    zoom={zoom}
-                    aspect={1}
-                    cropShape="round"
-                    showGrid={false}
-                    onCropChange={setCrop}
-                    onCropComplete={handleCropComplete}
-                    onZoomChange={setZoom}
-                  />
+                        ))
+                      )}
+                    </tbody>
+                  </table>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="crop-zoom">Zoom</Label>
-                  <input
-                    id="crop-zoom"
-                    type="range"
-                    min={1}
-                    max={3}
-                    step={0.05}
-                    value={zoom}
-                    onChange={(event) => setZoom(Number(event.target.value))}
-                    className="w-full"
-                  />
-                </div>
-              </div>
-              <div className="flex items-center justify-end gap-2 border-t px-6 py-4">
-                <Button type="button" variant="outline" onClick={closeCropModal} disabled={profileUploading}>
-                  Cancel
-                </Button>
-                <Button type="button" onClick={handleCroppedUpload} disabled={profileUploading}>
-                  {profileUploading ? 'Uploading…' : 'Crop & upload'}
-                </Button>
-              </div>
-            </div>
+              </CardContent>
+            </Card>
+          </div>
+        ) : activePage === 'bookings' ? (
+          <MyBookingsPage embedded />
+        ) : activePage === 'resource-management' ? (
+          <AdminResourceManagementPage embedded />
+        ) : activePage === 'manage-bookings' ? (
+          <AdminBookingPage embedded />
+        ) : (
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+            {[
+              { key: 'catalogue', icon: Building2, title: 'Asset Catalogue', desc: 'Browse campus facilities and smart resources.' },
+              { key: 'my-bookings', icon: BookOpen, title: 'My Schedule', desc: 'Track your pending and active reservations.' },
+              { key: 'tickets', icon: LifeBuoy, title: 'Operational Tickets', desc: 'Report issues or request maintenance.' }
+            ].map(m => (
+              <Card key={m.key} className="cursor-pointer group hover:border-primary/50 transition-all bg-card border-border shadow-xl hover:shadow-primary/5" onClick={() => openDashboardModule(m.key)}>
+                <CardHeader className="flex flex-row items-start gap-4 space-y-0">
+                  <div className="p-3 rounded-2xl bg-primary/5 text-primary group-hover:bg-primary group-hover:text-white transition-all shadow-inner">
+                    <m.icon className="size-6" />
+                  </div>
+                  <div className="space-y-1">
+                    <CardTitle className="text-xl font-black group-hover:text-primary transition-colors">{m.title}</CardTitle>
+                    <CardDescription className="text-sm font-medium">{m.desc}</CardDescription>
+                  </div>
+                </CardHeader>
+                <CardFooter className="bg-muted/10 px-6 py-4 border-t border-border/50 flex items-center justify-between">
+                  <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground group-hover:text-primary">Enter Module</span>
+                  <ChevronRight className="size-4 text-muted-foreground group-hover:translate-x-1 transition-transform" />
+                </CardFooter>
+              </Card>
+            ))}
           </div>
         )}
-    </>
+      </div>
+
+      {cropModalOpen && cropSourceImage && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-in fade-in duration-300">
+          <Card className="w-full max-w-2xl bg-background border-border shadow-2xl overflow-hidden scale-in-95 duration-300">
+            <div className="border-b border-border p-6 flex items-center justify-between bg-muted/10">
+              <div className="space-y-1">
+                <h3 className="text-xl font-black">Refine Identity Portrait</h3>
+                <p className="text-sm text-muted-foreground">Adjust the frame to your preference.</p>
+              </div>
+              <Button variant="ghost" size="icon" onClick={closeCropModal}><XCircle className="size-5" /></Button>
+            </div>
+            <CardContent className="p-8 space-y-6">
+              <div className="relative h-[400px] w-full overflow-hidden rounded-3xl bg-slate-950 border border-border shadow-inner">
+                <Cropper
+                  image={cropSourceImage}
+                  crop={crop}
+                  zoom={zoom}
+                  aspect={1}
+                  cropShape="round"
+                  showGrid={false}
+                  onCropChange={setCrop}
+                  onCropComplete={handleCropComplete}
+                  onZoomChange={setZoom}
+                />
+              </div>
+              <div className="space-y-4">
+                <div className="flex justify-between items-center px-2">
+                  <Label htmlFor="zoom" className="text-xs font-black uppercase tracking-widest text-muted-foreground">Optical Zoom</Label>
+                  <span className="text-xs font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full">{Math.round(zoom * 100)}%</span>
+                </div>
+                <input
+                  id="zoom"
+                  type="range"
+                  min={1}
+                  max={3}
+                  step={0.1}
+                  value={zoom}
+                  onChange={e => setZoom(parseFloat(e.target.value))}
+                  className="w-full h-1.5 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
+                />
+              </div>
+            </CardContent>
+            <CardFooter className="p-8 border-t border-border bg-muted/10 flex justify-end gap-3">
+              <Button variant="ghost" className="font-bold text-muted-foreground" onClick={closeCropModal} disabled={profileUploading}>Cancel</Button>
+              <Button onClick={handleCroppedUpload} className="bg-primary hover:bg-primary/90 font-bold px-10 h-11" disabled={profileUploading}>
+                {profileUploading ? 'Processing...' : 'Deploy Portrait'}
+              </Button>
+            </CardFooter>
+          </Card>
+        </div>
+      )}
+    </div>
   );
 }

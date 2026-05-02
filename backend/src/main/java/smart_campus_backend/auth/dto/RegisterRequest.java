@@ -24,4 +24,14 @@ public class RegisterRequest {
     private String semester;
     private String role;
     private String adminPasscode;
+    
+    // Additional Profile Details
+    private String studentId;
+    private String companyId;
+    private String department;
+    private String designation;
+    private String bio;
+    private String officeLocation;
+    private String emergencyContact;
+    private String socialLink;
 }

@@ -6,15 +6,22 @@ const normalizeRole = (role) => String(role || 'USER').replace(/^ROLE_/, '');
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(() => {
-    const stored = localStorage.getItem('user');
-    if (!stored) return null;
-    const parsed = JSON.parse(stored);
-    const id = parsed.userId ?? parsed.id;
-    return {
-      ...parsed,
-      ...(id != null ? { id: String(id) } : {}),
-      role: normalizeRole(parsed.role),
-    };
+    try {
+      const stored = localStorage.getItem('user');
+      if (!stored) return null;
+      const parsed = JSON.parse(stored);
+      if (!parsed) return null;
+      const id = parsed.userId ?? parsed.id;
+      return {
+        ...parsed,
+        ...(id != null ? { id: String(id) } : {}),
+        role: normalizeRole(parsed.role),
+      };
+    } catch (err) {
+      console.error('Error parsing user from localStorage:', err);
+      localStorage.removeItem('user');
+      return null;
+    }
   });
 
   const [token, setToken] = useState(() => localStorage.getItem('token'));
@@ -23,12 +30,11 @@ export function AuthProvider({ children }) {
     const normalizedRole = normalizeRole(data.role);
     const id = data.userId ?? data.id;
     const userPayload = {
-      name: data.name,
-      email: data.email,
-      profileImageUrl: data.profileImageUrl ?? null,
+      ...data,
       role: normalizedRole,
       ...(id != null ? { id: String(id) } : {}),
     };
+    delete userPayload.token; // Don't store token in user object
     localStorage.setItem('token', data.token);
     localStorage.setItem('user', JSON.stringify(userPayload));
     setToken(data.token);
@@ -36,29 +42,32 @@ export function AuthProvider({ children }) {
   }, []);
 
   const syncSessionUser = useCallback((data) => {
-    const normalizedRole = normalizeRole(data.role);
-    const stored = localStorage.getItem('user');
-    const parsed = stored ? JSON.parse(stored) : {};
-    const id = data.userId ?? data.id ?? parsed.id;
-    const userPayload = {
-      name: data.name,
-      email: data.email,
-      profileImageUrl: data.profileImageUrl ?? parsed.profileImageUrl ?? null,
-      role: normalizedRole,
-      ...(id != null ? { id: String(id) } : {}),
-    };
-    localStorage.setItem('user', JSON.stringify(userPayload));
-    setUser(userPayload);
+    try {
+      const normalizedRole = normalizeRole(data.role);
+      const stored = localStorage.getItem('user');
+      const parsed = stored ? JSON.parse(stored) : {};
+      const id = data.userId ?? data.id ?? parsed.id;
+      const userPayload = {
+        ...parsed,
+        ...data,
+        role: normalizedRole,
+        ...(id != null ? { id: String(id) } : {}),
+      };
+      localStorage.setItem('user', JSON.stringify(userPayload));
+      setUser(userPayload);
+    } catch (err) {
+      console.error('Error syncing session user:', err);
+    }
   }, []);
 
-  const register = useCallback(async (name, email, password, contactNo, academicYear, semester, role, adminPasscode) => {
-    const res = await api.post('/api/auth/register', { name, email, password, contactNo, academicYear, semester, role, adminPasscode });
+  const register = useCallback(async (payload) => {
+    const res = await api.post('/api/auth/register', payload);
     saveSession(res.data);
     return res.data;
   }, [saveSession]);
 
-  const registerWithInvite = useCallback(async (token, name, email, password, contactNo, academicYear, semester) => {
-    const res = await api.post('/api/auth/register-invite', { token, name, email, password, contactNo, academicYear, semester });
+  const registerWithInvite = useCallback(async (payload) => {
+    const res = await api.post('/api/auth/register-invite', payload);
     saveSession(res.data);
     return res.data;
   }, [saveSession]);
@@ -75,8 +84,8 @@ export function AuthProvider({ children }) {
     return res.data;
   }, [saveSession]);
 
-  const updateProfile = useCallback(async (name, profileImageUrl) => {
-    const res = await api.put('/api/auth/me', { name, profileImageUrl });
+  const updateProfile = useCallback(async (payload) => {
+    const res = await api.put('/api/auth/me', payload);
     saveSession(res.data);
     return res.data;
   }, [saveSession]);

@@ -29,10 +29,16 @@ export default function LoginPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    
+    // Basic Validations
+    if (!email.trim()) { setError('Email address is required'); return; }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { setError('Please enter a valid email address'); return; }
+    if (!password) { setError('Password is required'); return; }
+
     setLoading(true);
     try {
       await login(email, password);
-      navigate('/dashboard');
+      navigate('/dashboard?section=settings');
     } catch (err) {
       if (!err?.response) {
         setError('Cannot reach server. Please make sure backend is running on port 8080.');
@@ -49,7 +55,7 @@ export default function LoginPage() {
     setLoading(true);
     try {
       await loginWithGoogle(credentialResponse.credential);
-      navigate('/dashboard');
+      navigate('/dashboard?section=settings');
     } catch (err) {
       setError(err.response?.data?.message || 'Google sign-in failed');
     } finally {
@@ -60,35 +66,35 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen grid lg:grid-cols-2">
       {/* Left Side: Branding / Background */}
-      <div className="hidden lg:flex flex-col justify-between p-12 bg-linear-to-br from-[#3B5BDB] via-[#8B5CF6] to-[#0F172A] text-white relative overflow-hidden">
-        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1523050353010-38fe5730d9b5?auto=format&fit=crop&q=80')] opacity-10 bg-cover bg-center" />
+      <div className="hidden lg:flex flex-col justify-between p-12 bg-linear-to-br from-[#0f172a] via-[#0d9488] to-[#134e4a] text-white relative overflow-hidden">
+        <div className="absolute inset-0 opacity-15 bg-cover bg-center" style={{ backgroundImage: "url('/campus_bg_new_1777603540244.png')" }} />
         <div className="relative z-10">
-          <div className="flex items-center gap-2 mb-8">
-            <div className="p-2 bg-[#1E293B]/40 rounded-xl backdrop-blur-md border border-[#5C7CFA]/30">
-              <GraduationCap className="size-8 text-[#A9B8FF]" />
+          <div className="flex items-center gap-3 mb-10">
+            <div className="p-1.5 bg-white/10 rounded-xl backdrop-blur-xl border border-white/20 shadow-2xl">
+              <img src="/hub_logo_new_1777603517713.png" alt="Logo" className="size-10 rounded-lg object-contain" />
             </div>
-            <span className="text-2xl font-bold tracking-tight text-white">Smart Campus</span>
+            <span className="text-2xl font-bold tracking-tight text-white/95">Smart Campus Operations Hub</span>
           </div>
-          <h1 className="text-5xl font-extrabold leading-tight mb-6 text-white">
-            Elevate Your <br />
-            <span className="text-[#A9B8FF]">Academic Journey</span>
+          <h1 className="text-6xl font-black leading-tight mb-8 text-white tracking-tighter">
+            Operational <br />
+            <span className="text-[#5EEAD4]">Excellence.</span>
           </h1>
-          <p className="text-lg text-[#F8FAFC] max-w-md leading-relaxed opacity-90">
-            The all-in-one platform to manage your courses, track progress, and collaborate with peers in a modern digital environment.
+          <p className="text-xl text-[#CCFBF1] max-w-lg leading-relaxed font-medium opacity-90 border-l-4 border-[#0D9488] pl-6 py-2 bg-white/5 rounded-r-lg">
+            A unified ecosystem designed to streamline campus management, optimize resource allocation, and enhance the academic experience through smart automation.
           </p>
         </div>
-        <div className="relative z-10 flex gap-12 text-sm text-[#A9B8FF] font-medium">
-          <div>
-            <p className="text-white font-bold text-xl">10k+</p>
-            <p>Active Students</p>
+        <div className="relative z-10 flex gap-12 text-sm text-[#99F6E4] font-medium">
+          <div className="bg-white/5 p-4 rounded-2xl backdrop-blur-sm border border-white/10">
+            <p className="text-white font-black text-2xl">99.9%</p>
+            <p className="text-xs uppercase tracking-widest opacity-70">Uptime Reliability</p>
           </div>
-          <div>
-            <p className="text-white font-bold text-xl">500+</p>
-            <p>Top Rated Courses</p>
+          <div className="bg-white/5 p-4 rounded-2xl backdrop-blur-sm border border-white/10">
+            <p className="text-white font-black text-2xl">50ms</p>
+            <p className="text-xs uppercase tracking-widest opacity-70">Response Speed</p>
           </div>
-          <div>
-            <p className="text-white font-bold text-xl">24/7</p>
-            <p>Smart Support</p>
+          <div className="bg-white/5 p-4 rounded-2xl backdrop-blur-sm border border-white/10">
+            <p className="text-white font-black text-2xl">AI</p>
+            <p className="text-xs uppercase tracking-widest opacity-70">Driven Insights</p>
           </div>
         </div>
       </div>

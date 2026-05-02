@@ -25,17 +25,17 @@ export const Navbar = () => {
     const isHomePage = location.pathname === '/';
 
     return (
-        <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b border-slate-800 bg-slate-950/80 px-4 md:px-8 backdrop-blur-md text-slate-50 shadow-sm">
+        <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b border-border bg-background/80 dark:bg-slate-950/80 px-4 md:px-8 backdrop-blur-md text-foreground dark:text-slate-50 shadow-sm transition-colors duration-300">
             <div className="flex items-center gap-4">
-                {!isHomePage && <SidebarTrigger className="text-slate-300 hover:text-white" />}
+                {!isHomePage && <SidebarTrigger className="text-muted-foreground hover:text-foreground dark:text-slate-300 dark:hover:text-white" />}
                 
-                <Link to="/" className="flex items-center gap-3 text-white no-underline hover:opacity-90 transition-opacity">
+                <Link to="/" className="flex items-center gap-3 text-foreground dark:text-white no-underline hover:opacity-90 transition-opacity">
                     <img
-                        src="/smart%20campus%20logo.png"
-                        alt="Smart Campus"
+                        src="/hub_logo_new_1777603517713.png"
+                        alt="Smart Campus Operations Hub"
                         className="size-8 rounded-lg object-cover"
                     />
-                    <span className="font-bold text-lg hidden sm:inline-block tracking-tight">Smart Campus</span>
+                    <span className="font-bold text-lg hidden sm:inline-block tracking-tight">Smart Campus Operations Hub</span>
                 </Link>
             </div>
 
@@ -54,20 +54,20 @@ export const Navbar = () => {
                                 </Avatar>
                             </button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-56 mt-1 border-slate-800 bg-slate-950 text-slate-200">
+                        <DropdownMenuContent align="end" className="w-56 mt-1 border-border bg-popover text-popover-foreground dark:border-slate-800 dark:bg-slate-950 dark:text-slate-200">
                             <DropdownMenuLabel>
                                 <div className="flex flex-col space-y-1">
-                                    <p className="text-sm font-medium leading-none text-slate-100">{user.name}</p>
-                                    <p className="text-xs leading-none text-slate-400">{user.email}</p>
+                                    <p className="text-sm font-medium leading-none text-foreground dark:text-slate-100">{user.name}</p>
+                                    <p className="text-xs leading-none text-muted-foreground dark:text-slate-400">{user.email}</p>
                                 </div>
                             </DropdownMenuLabel>
                             <DropdownMenuSeparator className="bg-slate-800" />
-                            <DropdownMenuItem onClick={handleProfile} className="cursor-pointer focus:bg-slate-800 focus:text-slate-100">
+                            <DropdownMenuItem onClick={handleProfile} className="cursor-pointer focus:bg-accent focus:text-accent-foreground dark:focus:bg-slate-800 dark:focus:text-slate-100">
                                 <User className="mr-2 h-4 w-4" />
-                                <span>Profile Details</span>
+                                <span>Settings</span>
                             </DropdownMenuItem>
                             <DropdownMenuSeparator className="bg-slate-800" />
-                            <DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-red-400 focus:text-red-300 focus:bg-red-950/30">
+                            <DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-rose-600 dark:text-red-400 focus:text-rose-700 dark:focus:text-red-300 focus:bg-rose-50 dark:focus:bg-red-950/30">
                                 <LogOut className="mr-2 h-4 w-4" />
                                 <span>Logout</span>
                             </DropdownMenuItem>

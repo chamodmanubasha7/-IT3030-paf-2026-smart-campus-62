@@ -96,6 +96,14 @@ public class AuthService {
                 .contactNo(request.getContactNo())
                 .academicYear(request.getAcademicYear())
                 .semester(request.getSemester())
+                .studentId(request.getStudentId())
+                .companyId(request.getCompanyId())
+                .department(request.getDepartment())
+                .designation(request.getDesignation())
+                .bio(request.getBio())
+                .officeLocation(request.getOfficeLocation())
+                .emergencyContact(request.getEmergencyContact())
+                .socialLink(request.getSocialLink())
                 .provider(AuthProvider.LOCAL)
                 .role(userRole)
                 .build();
@@ -112,6 +120,17 @@ public class AuthService {
                 .email(user.getEmail())
                 .profileImageUrl(user.getProfileImageUrl())
                 .role(user.getRole().name())
+                .contactNo(user.getContactNo())
+                .academicYear(user.getAcademicYear())
+                .semester(user.getSemester())
+                .studentId(user.getStudentId())
+                .companyId(user.getCompanyId())
+                .department(user.getDepartment())
+                .designation(user.getDesignation())
+                .bio(user.getBio())
+                .officeLocation(user.getOfficeLocation())
+                .emergencyContact(user.getEmergencyContact())
+                .socialLink(user.getSocialLink())
                 .build();
     }
 
@@ -159,6 +178,17 @@ public class AuthService {
                 .email(user.getEmail())
                 .profileImageUrl(user.getProfileImageUrl())
                 .role(user.getRole().name())
+                .contactNo(user.getContactNo())
+                .academicYear(user.getAcademicYear())
+                .semester(user.getSemester())
+                .studentId(user.getStudentId())
+                .companyId(user.getCompanyId())
+                .department(user.getDepartment())
+                .designation(user.getDesignation())
+                .bio(user.getBio())
+                .officeLocation(user.getOfficeLocation())
+                .emergencyContact(user.getEmergencyContact())
+                .socialLink(user.getSocialLink())
                 .build();
     }
 
@@ -190,6 +220,17 @@ public class AuthService {
                 .email(user.getEmail())
                 .profileImageUrl(user.getProfileImageUrl())
                 .role(user.getRole().name())
+                .contactNo(user.getContactNo())
+                .academicYear(user.getAcademicYear())
+                .semester(user.getSemester())
+                .studentId(user.getStudentId())
+                .companyId(user.getCompanyId())
+                .department(user.getDepartment())
+                .designation(user.getDesignation())
+                .bio(user.getBio())
+                .officeLocation(user.getOfficeLocation())
+                .emergencyContact(user.getEmergencyContact())
+                .socialLink(user.getSocialLink())
                 .build();
     }
 
@@ -243,6 +284,17 @@ public class AuthService {
                 .email(user.getEmail())
                 .profileImageUrl(user.getProfileImageUrl())
                 .role(user.getRole().name())
+                .contactNo(user.getContactNo())
+                .academicYear(user.getAcademicYear())
+                .semester(user.getSemester())
+                .studentId(user.getStudentId())
+                .companyId(user.getCompanyId())
+                .department(user.getDepartment())
+                .designation(user.getDesignation())
+                .bio(user.getBio())
+                .officeLocation(user.getOfficeLocation())
+                .emergencyContact(user.getEmergencyContact())
+                .socialLink(user.getSocialLink())
                 .build();
     }
 
@@ -259,6 +311,17 @@ public class AuthService {
                 .email(user.getEmail())
                 .profileImageUrl(user.getProfileImageUrl())
                 .role(user.getRole().name())
+                .contactNo(user.getContactNo())
+                .academicYear(user.getAcademicYear())
+                .semester(user.getSemester())
+                .studentId(user.getStudentId())
+                .companyId(user.getCompanyId())
+                .department(user.getDepartment())
+                .designation(user.getDesignation())
+                .bio(user.getBio())
+                .officeLocation(user.getOfficeLocation())
+                .emergencyContact(user.getEmergencyContact())
+                .socialLink(user.getSocialLink())
                 .build();
     }
 
@@ -280,6 +343,19 @@ public class AuthService {
         user.setProfileImageUrl(normalizedProfileImageUrl == null || normalizedProfileImageUrl.isBlank()
                 ? null
                 : normalizedProfileImageUrl);
+        
+        user.setContactNo(request.getContactNo());
+        user.setAcademicYear(request.getAcademicYear());
+        user.setSemester(request.getSemester());
+        user.setStudentId(request.getStudentId());
+        user.setCompanyId(request.getCompanyId());
+        user.setDepartment(request.getDepartment());
+        user.setDesignation(request.getDesignation());
+        user.setBio(request.getBio());
+        user.setOfficeLocation(request.getOfficeLocation());
+        user.setEmergencyContact(request.getEmergencyContact());
+        user.setSocialLink(request.getSocialLink());
+
         user = userRepository.save(user);
 
         UserDetails userDetails = userDetailsService.loadUserByUsername(user.getEmail());
@@ -292,6 +368,17 @@ public class AuthService {
                 .email(user.getEmail())
                 .profileImageUrl(user.getProfileImageUrl())
                 .role(user.getRole().name())
+                .contactNo(user.getContactNo())
+                .academicYear(user.getAcademicYear())
+                .semester(user.getSemester())
+                .studentId(user.getStudentId())
+                .companyId(user.getCompanyId())
+                .department(user.getDepartment())
+                .designation(user.getDesignation())
+                .bio(user.getBio())
+                .officeLocation(user.getOfficeLocation())
+                .emergencyContact(user.getEmergencyContact())
+                .socialLink(user.getSocialLink())
                 .build();
     }
 
@@ -326,6 +413,17 @@ public class AuthService {
                 .email(user.getEmail())
                 .profileImageUrl(user.getProfileImageUrl())
                 .role(user.getRole().name())
+                .contactNo(user.getContactNo())
+                .academicYear(user.getAcademicYear())
+                .semester(user.getSemester())
+                .studentId(user.getStudentId())
+                .companyId(user.getCompanyId())
+                .department(user.getDepartment())
+                .designation(user.getDesignation())
+                .bio(user.getBio())
+                .officeLocation(user.getOfficeLocation())
+                .emergencyContact(user.getEmergencyContact())
+                .socialLink(user.getSocialLink())
                 .build();
     }
 

@@ -2,6 +2,7 @@ import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
 import TicketPriorityBadge from '@/components/tickets/TicketPriorityBadge';
 import TicketStatusBadge from '@/components/tickets/TicketStatusBadge';
+import { ExternalLink, User as UserIcon, Calendar, Hash } from 'lucide-react';
 
 export default function TicketTable({
   tickets,
@@ -10,69 +11,92 @@ export default function TicketTable({
   emptyMessage = 'No tickets match your filters.',
 }) {
   const { user } = useAuth();
-  const isUser = user?.role === 'USER';
 
   if (!tickets.length) {
     return (
-      <div className={isUser ? "rounded-lg border border-dashed border-slate-200 py-12 text-center text-sm text-slate-500 bg-slate-50/50" : "rounded-lg border border-dashed border-slate-200 py-12 text-center text-sm text-slate-500 dark:border-slate-800"}>
-        {emptyMessage}
+      <div className="rounded-3xl border-2 border-dashed border-border/50 py-24 text-center bg-muted/5">
+        <p className="text-lg font-black text-muted-foreground uppercase tracking-widest">{emptyMessage}</p>
+        <p className="text-sm text-muted-foreground/60 mt-2">Try adjusting your filters to find what you're looking for.</p>
       </div>
     );
   }
 
   return (
-    <div className={isUser ? "overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-sm" : "overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800"}>
-      <table className="w-full min-w-[720px] border-collapse text-left text-sm">
+    <div className="overflow-x-auto rounded-3xl border border-border shadow-2xl bg-white dark:bg-slate-900">
+      <table className="w-full min-w-[900px] border-collapse text-left">
         <thead>
-          <tr className={isUser ? "border-b border-slate-100 bg-slate-50/50" : "border-b border-slate-200 bg-slate-50/90 dark:border-slate-800 dark:bg-slate-900/50"}>
-            <th className={`px-4 py-3 font-semibold ${isUser ? 'text-[var(--text-secondary)]' : 'text-slate-700 dark:text-slate-300'}`}>ID</th>
-            <th className={`px-4 py-3 font-semibold ${isUser ? 'text-[var(--text-secondary)]' : 'text-slate-700 dark:text-slate-300'}`}>Title</th>
-            <th className={`px-4 py-3 font-semibold ${isUser ? 'text-[var(--text-secondary)]' : 'text-slate-700 dark:text-slate-300'}`}>Category</th>
-            <th className={`px-4 py-3 font-semibold ${isUser ? 'text-[var(--text-secondary)]' : 'text-slate-700 dark:text-slate-300'}`}>Assigned technician</th>
-            <th className={`px-4 py-3 font-semibold ${isUser ? 'text-[var(--text-secondary)]' : 'text-slate-700 dark:text-slate-300'}`}>Priority</th>
-            <th className={`px-4 py-3 font-semibold ${isUser ? 'text-[var(--text-secondary)]' : 'text-slate-700 dark:text-slate-300'}`}>Status</th>
-            <th className={`px-4 py-3 font-semibold ${isUser ? 'text-[var(--text-secondary)]' : 'text-slate-700 dark:text-slate-300'}`}>Updated</th>
-            <th className={`px-4 py-3 font-semibold ${isUser ? 'text-[var(--text-secondary)]' : 'text-slate-700 dark:text-slate-300'}`} />
+          <tr className="border-b-2 border-border bg-slate-50 dark:bg-slate-800/50">
+            <th className="px-8 py-5 text-xs font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">
+              <div className="flex items-center gap-2">
+                <Hash className="size-3.5" />
+                Ref
+              </div>
+            </th>
+            <th className="px-8 py-5 text-xs font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">Subject & Category</th>
+            <th className="px-8 py-5 text-xs font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">Assignee</th>
+            <th className="px-8 py-5 text-xs font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">Priority</th>
+            <th className="px-8 py-5 text-xs font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">Status</th>
+            <th className="px-8 py-5 text-xs font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">
+              <div className="flex items-center gap-2">
+                <Calendar className="size-3.5" />
+                Updated
+              </div>
+            </th>
+            <th className="px-8 py-5 text-xs font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 text-right">Actions</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody className="divide-y divide-border">
           {tickets.map((t) => (
             <tr
               key={t.id}
-              className={isUser 
-                ? `border-b border-slate-100 transition-colors hover:bg-slate-50 ${selectedId != null && t.id === selectedId ? 'bg-blue-50' : ''}`
-                : `border-b border-slate-100 transition-colors hover:bg-slate-50/80 dark:border-slate-800 dark:hover:bg-slate-900/40 ${selectedId != null && t.id === selectedId ? 'bg-sky-50/90 dark:bg-sky-950/30' : ''}`
-              }
+              className={`group transition-all hover:bg-primary/[0.02] cursor-pointer ${selectedId != null && t.id === selectedId ? 'bg-primary/5' : ''}`}
+              onClick={() => onRowClick?.(t)}
             >
-              <td className={`px-4 py-3 font-mono text-xs ${isUser ? 'text-[var(--text-secondary)] opacity-70' : 'text-slate-500 dark:text-slate-400'}`}>#{t.id}</td>
-              <td className="max-w-[240px] px-4 py-3">
-                <span className={`line-clamp-2 font-medium ${isUser ? 'text-[var(--text-primary)]' : 'text-slate-900 dark:text-slate-100'}`}>{t.title}</span>
-              </td>
-              <td className={`px-4 py-3 ${isUser ? 'text-[var(--text-secondary)]' : 'text-slate-600 dark:text-slate-400'}`}>{t.category}</td>
-              <td className="max-w-[220px] px-4 py-3">
-                <span className={`line-clamp-1 ${isUser ? 'text-[var(--text-secondary)]' : 'text-slate-600 dark:text-slate-400'}`}>
-                  {t.assignedTechnicianName || 'Unassigned'}
+              <td className="px-8 py-6">
+                <span className="font-mono text-xs font-black bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-lg text-slate-600 dark:text-slate-300 border border-border/50">
+                  #{t.id?.slice(-8) || 'N/A'}
                 </span>
               </td>
-              <td className="px-4 py-3">
-                <TicketPriorityBadge priority={t.priority} isUser={isUser} />
+              <td className="px-8 py-6 max-w-[350px]">
+                <div className="space-y-1.5">
+                   <p className="text-sm font-extrabold text-foreground group-hover:text-primary transition-colors truncate">
+                     {t.title}
+                   </p>
+                   <p className="text-[10px] font-bold text-muted-foreground/70 uppercase tracking-widest bg-muted w-fit px-2 py-0.5 rounded">
+                     {t.category}
+                   </p>
+                </div>
               </td>
-              <td className="px-4 py-3">
-                <TicketStatusBadge status={t.status} isUser={isUser} />
+              <td className="px-8 py-6">
+                <div className="flex items-center gap-3">
+                  <div className="size-8 rounded-xl bg-primary/10 flex items-center justify-center border border-primary/20 shadow-sm">
+                    <UserIcon className="size-4 text-primary" />
+                  </div>
+                  <span className="text-sm font-bold text-foreground/90">
+                    {t.assignedTechnicianName || <span className="text-muted-foreground/40 italic">Unassigned</span>}
+                  </span>
+                </div>
               </td>
-              <td className={`whitespace-nowrap px-4 py-3 text-xs ${isUser ? 'text-[var(--text-secondary)]' : 'text-slate-500 dark:text-slate-400'}`}>
-                {t.updatedAt ? new Date(t.updatedAt).toLocaleString() : '—'}
+              <td className="px-8 py-6">
+                <TicketPriorityBadge priority={t.priority} />
               </td>
-              <td className="px-4 py-3 text-right">
-                {isUser ? (
-                  <button className="btn btn-secondary px-3 py-1 text-xs" type="button" onClick={() => onRowClick?.(t)}>
-                    View
-                  </button>
-                ) : (
-                  <Button variant="outline" size="sm" type="button" onClick={() => onRowClick?.(t)}>
-                    View
-                  </Button>
-                )}
+              <td className="px-8 py-6">
+                <TicketStatusBadge status={t.status} />
+              </td>
+              <td className="px-8 py-6 whitespace-nowrap">
+                <div className="flex flex-col gap-1">
+                  <span className="text-sm font-black text-slate-700 dark:text-slate-200">
+                    {t.updatedAt ? new Date(t.updatedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : '—'}
+                  </span>
+                  <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-tighter">
+                    {t.updatedAt ? new Date(t.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
+                  </span>
+                </div>
+              </td>
+              <td className="px-8 py-6 text-right">
+                <Button variant="outline" size="sm" className="h-9 w-9 p-0 rounded-xl border-border/60 hover:bg-primary hover:text-white hover:border-primary transition-all shadow-sm">
+                  <ExternalLink className="size-4" />
+                </Button>
               </td>
             </tr>
           ))}

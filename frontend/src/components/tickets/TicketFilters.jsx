@@ -1,5 +1,6 @@
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Search, Tag, Activity, ShieldAlert } from 'lucide-react';
 import { TICKET_CATEGORY, TICKET_PRIORITY, TICKET_STATUS } from '@/services/ticketsApi';
 
 export default function TicketFilters({
@@ -15,31 +16,34 @@ export default function TicketFilters({
   idPrefix = 'tf',
 }) {
   return (
-    <div className="flex flex-col gap-4 rounded-xl border border-slate-200 bg-slate-50/80 p-4 dark:border-slate-800 dark:bg-slate-900/40 md:flex-row md:flex-wrap md:items-end">
-      <div className="min-w-[200px] flex-1">
-        <Label htmlFor={`${idPrefix}-search`} className="text-xs text-slate-600 dark:text-slate-400">
-          Search title
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 w-full">
+      <div className="space-y-2">
+        <Label htmlFor={`${idPrefix}-search`} className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2">
+          <Search className="size-3" />
+          Filter by Title
         </Label>
         <Input
           id={`${idPrefix}-search`}
           value={search}
           onChange={(e) => onSearchChange(e.target.value)}
-          placeholder="Filter by title…"
-          className="mt-1"
+          placeholder="e.g. Broken AC in Lab 1"
+          className="h-11 bg-background shadow-sm border-border/50 focus:ring-primary"
         />
       </div>
-      {showCategory ? (
-        <div className="w-full min-w-[140px] md:w-44">
-          <Label htmlFor={`${idPrefix}-cat`} className="text-xs text-slate-600 dark:text-slate-400">
-            Category
+      
+      {showCategory && (
+        <div className="space-y-2">
+          <Label htmlFor={`${idPrefix}-cat`} className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2">
+            <Tag className="size-3" />
+            Support Category
           </Label>
           <select
             id={`${idPrefix}-cat`}
-            className="mt-1 flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-xs"
+            className="flex h-11 w-full rounded-md border border-border/50 bg-background px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-primary"
             value={category}
             onChange={(e) => onCategoryChange(e.target.value)}
           >
-            <option value="ALL">All categories</option>
+            <option value="ALL">All Categories</option>
             {TICKET_CATEGORY.map((c) => (
               <option key={c} value={c}>
                 {c}
@@ -47,18 +51,20 @@ export default function TicketFilters({
             ))}
           </select>
         </div>
-      ) : null}
-      <div className="w-full min-w-[140px] md:w-44">
-        <Label htmlFor={`${idPrefix}-st`} className="text-xs text-slate-600 dark:text-slate-400">
-          Status
+      )}
+
+      <div className="space-y-2">
+        <Label htmlFor={`${idPrefix}-st`} className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2">
+          <Activity className="size-3" />
+          Ticket Status
         </Label>
         <select
           id={`${idPrefix}-st`}
-          className="mt-1 flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-xs"
+          className="flex h-11 w-full rounded-md border border-border/50 bg-background px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-primary"
           value={status}
           onChange={(e) => onStatusChange(e.target.value)}
         >
-          <option value="ALL">All statuses</option>
+          <option value="ALL">All Statuses</option>
           {TICKET_STATUS.map((s) => (
             <option key={s} value={s}>
               {s.replace(/_/g, ' ')}
@@ -66,17 +72,19 @@ export default function TicketFilters({
           ))}
         </select>
       </div>
-      <div className="w-full min-w-[140px] md:w-44">
-        <Label htmlFor={`${idPrefix}-pr`} className="text-xs text-slate-600 dark:text-slate-400">
-          Priority
+
+      <div className="space-y-2">
+        <Label htmlFor={`${idPrefix}-pr`} className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2">
+          <ShieldAlert className="size-3" />
+          Priority Level
         </Label>
         <select
           id={`${idPrefix}-pr`}
-          className="mt-1 flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-xs"
+          className="flex h-11 w-full rounded-md border border-border/50 bg-background px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-primary"
           value={priority}
           onChange={(e) => onPriorityChange(e.target.value)}
         >
-          <option value="ALL">All priorities</option>
+          <option value="ALL">All Priorities</option>
           {TICKET_PRIORITY.map((p) => (
             <option key={p} value={p}>
               {p}

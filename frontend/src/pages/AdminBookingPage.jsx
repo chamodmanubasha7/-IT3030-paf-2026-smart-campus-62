@@ -1,16 +1,19 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { getAllBookings, approveBooking, rejectBooking, getTimeSlotAvailability, revokeApproval } from '../api/bookingApi';
-import { CheckCircle, XCircle, Clock, Users, Calendar as CalendarIcon, MessageSquare, Shield, Search, Filter, RefreshCw, ArrowUpDown } from 'lucide-react';
-import { NotificationBell } from '../components/NotificationBell';
+import { 
+  CheckCircle, XCircle, Clock, Users, Calendar as CalendarIcon, 
+  MessageSquare, Shield, Search, Filter, RefreshCw, ArrowUpDown, 
+  ChevronRight, Building2, User, AlertCircle, Info, MoreHorizontal
+} from 'lucide-react';
+
 import toast from 'react-hot-toast';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
-import { AppSidebar } from '@/components/app-sidebar';
 import { useAuth } from '@/context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { cn } from '@/lib/utils';
 
 export const AdminBookingPage = ({ embedded = false }) => {
     const { user, logout } = useAuth();
@@ -19,12 +22,11 @@ export const AdminBookingPage = ({ embedded = false }) => {
 
     const [bookings, setBookings] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [filter, setFilter] = useState('ALL'); // ALL, PENDING, WAITLISTED, APPROVED, REJECTED, CANCELLED
+    const [filter, setFilter] = useState('ALL'); 
     const [search, setSearch] = useState('');
     const [dateFilter, setDateFilter] = useState('');
     const [sortBy, setSortBy] = useState('ACTION_FIRST');
     
-    // Rejection Modal State
     const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
     const [selectedBookingId, setSelectedBookingId] = useState(null);
     const [rejectionReason, setRejectionReason] = useState('');
@@ -33,7 +35,6 @@ export const AdminBookingPage = ({ embedded = false }) => {
     const [selectedBookingForOverride, setSelectedBookingForOverride] = useState(null);
     const [availabilityByBooking, setAvailabilityByBooking] = useState({});
     
-    // Revoke Modal State
     const [isRevokeModalOpen, setIsRevokeModalOpen] = useState(false);
     const [revokeReason, setRevokeReason] = useState('');
     const [selectedBookingIdForRevoke, setSelectedBookingIdForRevoke] = useState(null);
@@ -113,10 +114,7 @@ export const AdminBookingPage = ({ embedded = false }) => {
     };
 
     const handleReject = async () => {
-        if (!selectedBookingId) {
-            toast.error('No booking selected for rejection');
-            return;
-        }
+        if (!selectedBookingId) return;
         if (!rejectionReason.trim()) {
             toast.error('Please provide a reason for rejection');
             return;
@@ -138,10 +136,7 @@ export const AdminBookingPage = ({ embedded = false }) => {
     };
 
     const handleRevoke = async () => {
-        if (!selectedBookingIdForRevoke) {
-            toast.error('No booking selected for revocation');
-            return;
-        }
+        if (!selectedBookingIdForRevoke) return;
         if (!revokeReason.trim()) {
             toast.error('Please provide a reason for revoking approval');
             return;
@@ -185,12 +180,8 @@ export const AdminBookingPage = ({ embedded = false }) => {
         });
 
         return filtered.sort((a, b) => {
-            if (sortBy === 'DATE_ASC') {
-                return toDateTime(a) - toDateTime(b);
-            }
-            if (sortBy === 'DATE_DESC') {
-                return toDateTime(b) - toDateTime(a);
-            }
+            if (sortBy === 'DATE_ASC') return toDateTime(a) - toDateTime(b);
+            if (sortBy === 'DATE_DESC') return toDateTime(b) - toDateTime(a);
             if (sortBy === 'QUEUE_FIRST') {
                 const aWait = a.status === 'WAITLISTED' ? 0 : 1;
                 const bWait = b.status === 'WAITLISTED' ? 0 : 1;
@@ -231,307 +222,353 @@ export const AdminBookingPage = ({ embedded = false }) => {
         return queueMap;
     }, [bookings]);
 
-    const getStatusVariant = (status) => {
+    const getStatusStyle = (status) => {
         switch (status) {
-            case 'APPROVED': return 'default';
-            case 'WAITLISTED': return 'secondary';
-            case 'REJECTED': return 'destructive';
-            case 'CANCELLED': return 'outline';
-            default: return 'secondary';
+            case 'APPROVED': return 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20';
+            case 'WAITLISTED': return 'bg-indigo-500/10 text-indigo-500 border-indigo-500/20';
+            case 'REJECTED': return 'bg-rose-500/10 text-rose-500 border-rose-500/20';
+            case 'CANCELLED': return 'bg-slate-500/10 text-slate-400 border-slate-500/20';
+            case 'PENDING': return 'bg-amber-500/10 text-amber-500 border-amber-500/20 animate-pulse';
+            default: return 'bg-slate-500/10 text-slate-500 border-slate-500/20';
         }
     };
 
     const getStatusLabel = (booking) => {
         if (booking.status === 'WAITLISTED') {
             const queuePosition = waitlistQueueByBookingId.get(booking.id);
-            return queuePosition ? `WAITLISTED (#${queuePosition})` : 'WAITLISTED';
-        }
-        if (booking.status === 'APPROVED' && booking.promotedAt) {
-            return 'APPROVED (PROMOTED)';
+            return queuePosition ? `QUEUED (#${queuePosition})` : 'QUEUED';
         }
         return booking.status;
     };
 
-    if (loading) return <div className="flex justify-center py-20"><div className="spinner"></div></div>;
-
-    const handleSidebarNavigate = (key) => {
-        if (key === 'dashboard') return navigate('/dashboard');
-        if (key === 'catalogue') return navigate('/');
-        if (key === 'my-bookings' || key === 'bookings') return navigate('/bookings/my');
-        if (key === 'tickets') return navigate(role === 'USER' ? '/tickets/my' : '/tickets/manage');
-        if (key === 'manage-bookings') return navigate('/admin/bookings');
-        if (key === 'analytics') return navigate('/admin/analytics');
-        if (['user-management', 'admin-management', 'super-admin-management', 'admin-invites', 'settings'].includes(key)) {
-            navigate(`/dashboard?section=${key}`);
-        }
-    };
-
-    const handleLogout = () => {
-        logout();
-        navigate('/login');
-    };
+    if (loading) {
+      return (
+        <div className="py-40 flex flex-col items-center justify-center space-y-4">
+          <div className="size-12 border-4 border-blue-500/20 border-t-blue-500 rounded-full animate-spin" />
+          <p className="text-xs font-black uppercase tracking-widest text-muted-foreground animate-pulse">Syncing Reservation Flow...</p>
+        </div>
+      );
+    }
 
     const content = (
-        <div className={`container animate-fade space-y-6 ${embedded ? '' : 'p-8'}`}>
-                    <div className="flex items-center justify-between gap-3">
-                        <div className="flex items-center gap-2">
-                            <Shield className="size-6 text-primary" />
-                            <h1 className="text-2xl font-semibold">Manage Bookings</h1>
-                        </div>
-                        <Badge variant="secondary">Admin Control Panel</Badge>
+        <div className={cn("space-y-8 pb-20 animate-in fade-in duration-700", embedded ? "" : "p-8 container")}>
+            {/* Premium Header */}
+            <div className="flex flex-col lg:flex-row gap-6 items-start lg:items-center justify-between">
+                <div className="space-y-2">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/10 text-[10px] font-black uppercase tracking-widest text-blue-500">
+                        <Shield className="size-3" />
+                        Administration Authority
                     </div>
+                    <h1 className="text-4xl font-black tracking-tight text-slate-900 dark:text-slate-50">Reservation Control</h1>
+                    <p className="text-sm font-medium text-muted-foreground">Orchestrating {bookings.length} campus facility requests.</p>
+                </div>
 
-                    <Card>
-                        <CardContent className="pt-6">
-                            <div className="flex flex-wrap items-end gap-3">
-                                <div className="min-w-[220px] flex-1">
-                                    <label className="mb-2 block text-sm font-medium"><Search className="mr-1 inline size-4" /> Search</label>
-                                    <Input
-                                        placeholder="Search by user, resource, or booking ID..."
-                                        value={search}
-                                        onChange={(e) => setSearch(e.target.value)}
-                                    />
+                <div className="flex flex-wrap gap-3 w-full lg:w-auto">
+                    <Button variant="outline" className="h-12 px-6 rounded-2xl border-border bg-white dark:bg-slate-900 font-bold shadow-xl transition-all hover:bg-slate-50" onClick={fetchBookings}>
+                        <RefreshCw className={cn("mr-2 size-4", loading && "animate-spin")} /> Synchronize
+                    </Button>
+                </div>
+            </div>
+
+            {/* Global Filters Area */}
+            <Card className="border-none shadow-2xl rounded-[2.5rem] overflow-hidden bg-white dark:bg-slate-900">
+                <CardContent className="p-8">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2"><Search className="size-3" /> Intelligence Search</label>
+                            <Input
+                                placeholder="User, Asset, or ID..."
+                                value={search}
+                                onChange={(e) => setSearch(e.target.value)}
+                                className="h-12 rounded-2xl bg-slate-50 dark:bg-slate-950 border-border/50 font-bold focus:ring-blue-500 shadow-inner"
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2"><Filter className="size-3" /> Flow Status</label>
+                            <select
+                                className="flex h-12 w-full rounded-2xl border border-border/50 bg-slate-50 dark:bg-slate-950 px-4 py-2 text-sm font-bold focus:ring-2 focus:ring-blue-500 transition-all outline-none"
+                                value={filter}
+                                onChange={(e) => setFilter(e.target.value)}
+                            >
+                                <option value="ALL">Total Inventory</option>
+                                <option value="PENDING">Pending Review</option>
+                                <option value="WAITLISTED">Waitlisted Flow</option>
+                                <option value="APPROVED">Operational/Approved</option>
+                                <option value="REJECTED">Rejected Requests</option>
+                                <option value="CANCELLED">Terminated</option>
+                            </select>
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2"><CalendarIcon className="size-3" /> Scheduled Date</label>
+                            <Input
+                                type="date"
+                                value={dateFilter}
+                                onChange={(e) => setDateFilter(e.target.value)}
+                                className="h-12 rounded-2xl bg-slate-50 dark:bg-slate-950 border-border/50 font-bold focus:ring-blue-500 shadow-inner"
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2"><ArrowUpDown className="size-3" /> Priority Sort</label>
+                            <select
+                                className="flex h-12 w-full rounded-2xl border border-border/50 bg-slate-50 dark:bg-slate-950 px-4 py-2 text-sm font-bold focus:ring-2 focus:ring-blue-500 transition-all outline-none"
+                                value={sortBy}
+                                onChange={(e) => setSortBy(e.target.value)}
+                            >
+                                <option value="ACTION_FIRST">Actionable (Pending/Queue)</option>
+                                <option value="DATE_DESC">Chronological (Newest)</option>
+                                <option value="DATE_ASC">Chronological (Oldest)</option>
+                                <option value="QUEUE_FIRST">Waitlist Priority</option>
+                            </select>
+                        </div>
+                    </div>
+                </CardContent>
+            </Card>
+
+            {/* Bookings Stream */}
+            <div className="grid gap-6">
+                {filteredBookings.length === 0 ? (
+                    <div className="py-32 text-center space-y-6">
+                        <div className="mx-auto size-24 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-300">
+                           <CalendarIcon className="size-10" />
+                        </div>
+                        <div className="space-y-2">
+                          <h3 className="text-2xl font-black text-slate-900 dark:text-slate-100">No Reservations Found</h3>
+                          <p className="text-muted-foreground font-medium max-w-sm mx-auto">The digital archives do not contain any records matching these parameters.</p>
+                        </div>
+                        <Button variant="outline" className="rounded-xl h-12 px-8 font-bold" onClick={() => { setSearch(''); setFilter('ALL'); setDateFilter(''); }}>Reset Protocol</Button>
+                    </div>
+                ) : (
+                    filteredBookings.map(booking => {
+                        const availability = availabilityByBooking[booking.id];
+                        const wouldExceedCapacity = Boolean(
+                            availability && booking.status === 'PENDING'
+                            && Number(booking.attendees || 0) > Number(availability.remaining || 0)
+                        );
+                        return (
+                        <Card key={booking.id} className="group border-none shadow-2xl rounded-[2.5rem] overflow-hidden bg-white dark:bg-slate-900 transition-all hover:shadow-blue-500/5 hover:-translate-y-1">
+                            <CardContent className="p-0">
+                                <div className="grid lg:grid-cols-[1fr_300px]">
+                                    <div className="p-8 lg:p-10 space-y-8">
+                                        <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
+                                            <div className="space-y-2">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="size-10 rounded-2xl bg-blue-500/10 flex items-center justify-center text-blue-500">
+                                                        <Building2 className="size-5" />
+                                                    </div>
+                                                    <h3 className="text-2xl font-black text-slate-900 dark:text-slate-100">{booking.resourceName}</h3>
+                                                </div>
+                                                <div className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-muted-foreground ml-13">
+                                                   <span className="text-blue-500">RES-ID:</span> {booking.id.slice(0, 12)}
+                                                </div>
+                                            </div>
+                                            <Badge className={cn("rounded-xl px-4 py-2 text-[10px] font-black uppercase tracking-widest border shadow-sm", getStatusStyle(booking.status))}>
+                                                {getStatusLabel(booking)}
+                                            </Badge>
+                                        </div>
+
+                                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                                            <div className="space-y-1">
+                                                <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Scheduled Slot</p>
+                                                <div className="flex items-center gap-2 font-bold text-sm">
+                                                    <CalendarIcon className="size-4 text-blue-400" />
+                                                    {booking.date}
+                                                </div>
+                                            </div>
+                                            <div className="space-y-1">
+                                                <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Time Window</p>
+                                                <div className="flex items-center gap-2 font-bold text-sm">
+                                                    <Clock className="size-4 text-amber-400" />
+                                                    {booking.startTime} - {booking.endTime}
+                                                </div>
+                                            </div>
+                                            <div className="space-y-1">
+                                                <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Occupancy</p>
+                                                <div className="flex items-center gap-2 font-bold text-sm">
+                                                    <Users className="size-4 text-indigo-400" />
+                                                    {booking.attendees} <span className="text-[10px] font-black opacity-50 uppercase tracking-widest ml-1">Delegates</span>
+                                                </div>
+                                            </div>
+                                            <div className="space-y-1">
+                                                <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Requesting Entity</p>
+                                                <div className="flex items-center gap-2 font-bold text-sm">
+                                                    <User className="size-4 text-emerald-400" />
+                                                    {booking.userName}
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="p-6 rounded-3xl bg-slate-50 dark:bg-slate-950 border border-border/30 space-y-3">
+                                            <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2"><MessageSquare className="size-3" /> Declaration of Purpose</h4>
+                                            <p className="text-sm font-medium leading-relaxed italic">"{booking.purpose || 'No official declaration provided.'}"</p>
+                                        </div>
+
+                                        {availability && (
+                                            <div className="flex flex-wrap items-center gap-4 text-[10px] font-black uppercase tracking-widest">
+                                                <div className="px-3 py-1.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500">
+                                                    Slot Utilization: <span className="text-slate-900 dark:text-slate-100 ml-1">{availability.used} / {availability.total}</span>
+                                                </div>
+                                                <div className={cn("px-3 py-1.5 rounded-full", availability.remaining > 0 ? "bg-emerald-500/10 text-emerald-600" : "bg-rose-500/10 text-rose-600")}>
+                                                    Available Bandwidth: {availability.remaining} Seats
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {booking.rejectionReason && (
+                                            <div className="p-6 rounded-3xl bg-rose-500/5 border border-rose-500/20 text-rose-600 space-y-2">
+                                                <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest">
+                                                    <XCircle className="size-4" /> System Rejection Logs
+                                                </div>
+                                                <p className="text-sm font-medium italic">"{booking.rejectionReason}"</p>
+                                            </div>
+                                        )}
+
+                                        {booking.capacityOverridden && (
+                                            <div className="p-6 rounded-3xl bg-indigo-500/5 border border-indigo-500/20 text-indigo-600 space-y-2">
+                                                <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest">
+                                                    <Shield className="size-4" /> Manual Authority Override
+                                                </div>
+                                                <p className="text-sm font-medium italic">"{booking.overrideReason}"</p>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Action Panel */}
+                                    <div className="bg-slate-50 dark:bg-slate-950/50 p-8 lg:p-10 border-l border-border/30 flex flex-col justify-center gap-4">
+                                        {booking.status === 'PENDING' && (
+                                            <>
+                                                <Button
+                                                    className={cn("h-14 rounded-2xl font-black shadow-xl transition-all active:scale-95", wouldExceedCapacity ? "bg-amber-600 hover:bg-amber-500" : "bg-blue-600 hover:bg-blue-500")}
+                                                    onClick={() => (wouldExceedCapacity ? openOverrideModal(booking) : handleApprove(booking.id))}
+                                                >
+                                                    <CheckCircle className="mr-2 size-5" /> 
+                                                    {wouldExceedCapacity ? 'Override & Approve' : 'Authorize Request'}
+                                                </Button>
+                                                <Button 
+                                                    variant="ghost" 
+                                                    className="h-14 rounded-2xl font-black text-rose-500 hover:bg-rose-500/10 hover:text-rose-600" 
+                                                    onClick={() => openRejectModal(booking.id)}
+                                                >
+                                                    <XCircle className="mr-2 size-5" /> Decline Request
+                                                </Button>
+                                            </>
+                                        )}
+                                        {booking.status === 'APPROVED' && (
+                                            <Button 
+                                                variant="ghost" 
+                                                className="h-14 rounded-2xl font-black text-rose-500 hover:bg-rose-500/10 border border-rose-500/20 shadow-xl" 
+                                                onClick={() => openRevokeModal(booking.id)}
+                                            >
+                                                <RefreshCw className="mr-2 size-5" /> Revoke Privilege
+                                            </Button>
+                                        )}
+                                        {booking.status === 'REJECTED' && (
+                                             <div className="text-center py-6">
+                                                <p className="text-[10px] font-black uppercase tracking-widest text-rose-500/60">Final Protocol: Terminated</p>
+                                             </div>
+                                        )}
+                                         {booking.status === 'CANCELLED' && (
+                                             <div className="text-center py-6">
+                                                <p className="text-[10px] font-black uppercase tracking-widest text-slate-500/60">Final Protocol: User Withdrawn</p>
+                                             </div>
+                                        )}
+                                        <div className="mt-auto pt-6 border-t border-border/30">
+                                            <div className="flex items-center gap-3">
+                                                <div className="size-10 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center font-bold text-xs">
+                                                    {booking.userName?.[0]?.toUpperCase() || 'U'}
+                                                </div>
+                                                <div className="min-w-0 flex-1">
+                                                    <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Action Timestamp</p>
+                                                    <p className="text-[11px] font-bold truncate">Last sync: {new Date().toLocaleTimeString()}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div className="min-w-[200px]">
-                                    <label className="mb-2 block text-sm font-medium"><Filter className="mr-1 inline size-4" /> Status</label>
-                                    <select
-                                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                                        value={filter}
-                                        onChange={(e) => setFilter(e.target.value)}
-                                    >
-                                        <option value="ALL">All Statuses</option>
-                                        <option value="PENDING">Pending Only</option>
-                                        <option value="WAITLISTED">Waitlisted</option>
-                                        <option value="APPROVED">Approved</option>
-                                        <option value="REJECTED">Rejected</option>
-                                        <option value="CANCELLED">Cancelled</option>
-                                    </select>
+                            </CardContent>
+                        </Card>
+                    );
+                })
+                )}
+            </div>
+
+            {/* Premium Modals */}
+            {isRejectModalOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-md p-4 animate-in fade-in duration-300">
+                    <Card className="w-full max-w-md border-none shadow-2xl rounded-[2.5rem] overflow-hidden bg-white dark:bg-slate-900">
+                        <div className="p-8 border-b border-border/50 bg-rose-500/5 text-rose-500">
+                            <h3 className="text-2xl font-black flex items-center gap-3"><AlertCircle className="size-6" /> Decline Request</h3>
+                            <p className="text-sm font-medium opacity-80 mt-1">Specify technical or operational reasons for rejection.</p>
+                        </div>
+                        <CardContent className="p-8 space-y-6">
+                            <textarea
+                                className="flex min-h-[150px] w-full rounded-2xl border border-border/50 bg-slate-50 dark:bg-slate-950 px-4 py-3 text-sm font-medium focus:ring-2 focus:ring-rose-500 transition-all outline-none"
+                                placeholder="e.g. Schedule collision detected, Maintenance in progress..."
+                                value={rejectionReason}
+                                onChange={(e) => setRejectionReason(e.target.value)}
+                            />
+                            <div className="flex gap-3">
+                                <Button variant="ghost" className="flex-1 h-12 rounded-xl font-bold" onClick={() => setIsRejectModalOpen(false)}>Discard</Button>
+                                <Button className="flex-1 h-12 rounded-xl bg-rose-600 hover:bg-rose-500 font-black shadow-xl shadow-rose-500/20" onClick={handleReject}>Confirm Decline</Button>
+                            </div>
+                        </CardContent>
+                    </Card>
+                </div>
+            )}
+
+            {isOverrideModalOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-md p-4 animate-in fade-in duration-300">
+                    <Card className="w-full max-w-md border-none shadow-2xl rounded-[2.5rem] overflow-hidden bg-white dark:bg-slate-900">
+                        <div className="p-8 border-b border-border/50 bg-amber-500/5 text-amber-600">
+                            <h3 className="text-2xl font-black flex items-center gap-3"><Shield className="size-6" /> Capacity Override</h3>
+                            <p className="text-sm font-medium opacity-80 mt-1">Critical saturation reached. Authorize manual exception?</p>
+                        </div>
+                        <CardContent className="p-8 space-y-6">
+                            {selectedBookingForOverride && (
+                                <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-[10px] font-bold text-amber-700 uppercase tracking-widest space-y-1">
+                                    <p>Asset: {selectedBookingForOverride.resourceName}</p>
+                                    <p>Time: {selectedBookingForOverride.date} {selectedBookingForOverride.startTime}</p>
                                 </div>
-                                <div className="min-w-[180px]">
-                                    <label className="mb-2 block text-sm font-medium"><CalendarIcon className="mr-1 inline size-4" /> Date</label>
-                                    <Input
-                                        type="date"
-                                        value={dateFilter}
-                                        onChange={(e) => setDateFilter(e.target.value)}
-                                    />
-                                </div>
-                                <div className="min-w-[210px]">
-                                    <label className="mb-2 block text-sm font-medium"><ArrowUpDown className="mr-1 inline size-4" /> Sort</label>
-                                    <select
-                                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                                        value={sortBy}
-                                        onChange={(e) => setSortBy(e.target.value)}
-                                    >
-                                        <option value="ACTION_FIRST">Action first (Pending/Waitlist first)</option>
-                                        <option value="DATE_DESC">Date/time newest first</option>
-                                        <option value="DATE_ASC">Date/time oldest first</option>
-                                        <option value="QUEUE_FIRST">Waitlist first</option>
-                                    </select>
-                                </div>
-                                <Button variant="outline" onClick={fetchBookings} disabled={loading}>
-                                    <RefreshCw className={`mr-2 size-4 ${loading ? 'animate-spin' : ''}`} />
-                                    Refresh
-                                </Button>
-                                <Button
-                                    variant="outline"
-                                    onClick={() => {
-                                        setSearch('');
-                                        setFilter('ALL');
-                                        setDateFilter('');
-                                        setSortBy('ACTION_FIRST');
-                                    }}
-                                >
-                                    Reset
+                            )}
+                            <textarea
+                                className="flex min-h-[120px] w-full rounded-2xl border border-border/50 bg-slate-50 dark:bg-slate-950 px-4 py-3 text-sm font-medium focus:ring-2 focus:ring-amber-500 transition-all outline-none"
+                                placeholder="State the justification for capacity override..."
+                                value={overrideReason}
+                                onChange={(e) => setOverrideReason(e.target.value)}
+                            />
+                            <div className="flex gap-3">
+                                <Button variant="ghost" className="flex-1 h-12 rounded-xl font-bold" onClick={() => setIsOverrideModalOpen(false)}>Abort</Button>
+                                <Button className="flex-1 h-12 rounded-xl bg-amber-600 hover:bg-amber-500 font-black shadow-xl shadow-amber-500/20" onClick={() => handleApprove(selectedBookingForOverride?.id, { forceOverride: true, overrideReason })}>
+                                    Confirm Override
                                 </Button>
                             </div>
                         </CardContent>
                     </Card>
-
-                    <div className="grid gap-4">
-                        {filteredBookings.length === 0 ? (
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle>No bookings found</CardTitle>
-                                    <CardDescription>No booking requests match your current filters.</CardDescription>
-                                </CardHeader>
-                            </Card>
-                        ) : (
-                            filteredBookings.map(booking => {
-                                const availability = availabilityByBooking[booking.id];
-                                const wouldExceedCapacity = Boolean(
-                                    availability && booking.status === 'PENDING'
-                                    && Number(booking.attendees || 0) > Number(availability.remaining || 0)
-                                );
-                                return (
-                                <Card key={booking.id}>
-                                    <CardContent className="pt-6">
-                                        <div className="grid gap-4 lg:grid-cols-[1fr_auto]">
-                                            <div className="space-y-3">
-                                                <h3 className="text-lg font-semibold">{booking.resourceName}</h3>
-                                                <div className="grid gap-2 text-sm text-muted-foreground md:grid-cols-2">
-                                                    <div className="flex items-center gap-2"><CalendarIcon className="size-4" /> {booking.date}</div>
-                                                    <div className="flex items-center gap-2"><Clock className="size-4" /> {booking.startTime} - {booking.endTime}</div>
-                                                    <div className="flex items-center gap-2"><Users className="size-4" /> {booking.attendees} attendees</div>
-                                                    <div className="flex items-center gap-2"><Shield className="size-4" /> {booking.userName}</div>
-                                                </div>
-                                                <p className="text-sm"><strong>Purpose:</strong> {booking.purpose}</p>
-                                                {availability && (
-                                                    <p className="text-xs text-muted-foreground">
-                                                        Slot Capacity: {availability.used}/{availability.total} used, {availability.remaining} remaining.
-                                                    </p>
-                                                )}
-                                                {wouldExceedCapacity && (
-                                                    <div className="rounded-md border border-amber-500/30 bg-amber-500/10 p-3 text-xs text-amber-700">
-                                                        This approval would exceed slot capacity.
-                                                    </div>
-                                                )}
-                                                {booking.rejectionReason && (
-                                                    <div className="rounded-md border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive">
-                                                        <MessageSquare className="mr-2 inline size-4" />
-                                                        <strong>Reason:</strong> {booking.rejectionReason}
-                                                    </div>
-                                                )}
-                                                {booking.capacityOverridden && booking.overrideReason && (
-                                                    <div className="rounded-md border border-indigo-500/30 bg-indigo-500/10 p-3 text-sm text-indigo-700">
-                                                        <strong>Manual override:</strong> {booking.overrideReason}
-                                                    </div>
-                                                )}
-                                                {booking.status === 'WAITLISTED' && (
-                                                    <div className="rounded-md border border-slate-300/50 bg-slate-100/60 p-3 text-xs text-slate-700">
-                                                        Queue position: <strong>#{waitlistQueueByBookingId.get(booking.id) || 'N/A'}</strong>
-                                                    </div>
-                                                )}
-                                                {booking.status === 'APPROVED' && booking.promotedAt && (
-                                                    <div className="rounded-md border border-emerald-500/30 bg-emerald-500/10 p-3 text-xs text-emerald-700">
-                                                        Auto-promoted from waitlist at {new Date(booking.promotedAt).toLocaleString()}.
-                                                    </div>
-                                                )}
-                                                {booking.lastActionBy && (booking.status === 'APPROVED' || booking.status === 'REJECTED') && (
-                                                    <p className="text-xs text-slate-500 mt-2">
-                                                        {booking.status === 'APPROVED' ? 'Approved by' : 'Rejected by'}: <span className="font-medium text-slate-300">{booking.lastActionBy}</span>
-                                                    </p>
-                                                )}
-                                            </div>
-
-                                            <div className="flex flex-col items-end gap-2">
-                                                <Badge variant={getStatusVariant(booking.status)}>{getStatusLabel(booking)}</Badge>
-                                                {booking.status === 'PENDING' && (
-                                                    <div className="flex gap-2">
-                                                        <Button
-                                                            onClick={() => (wouldExceedCapacity ? openOverrideModal(booking) : handleApprove(booking.id))}
-                                                        >
-                                                            <CheckCircle className="mr-2 size-4" /> Approve
-                                                        </Button>
-                                                        <Button variant="destructive" onClick={() => openRejectModal(booking.id)}>
-                                                            <XCircle className="mr-2 size-4" /> Reject
-                                                        </Button>
-                                                    </div>
-                                                )}
-                                                {booking.status === 'APPROVED' && (
-                                                    <Button variant="outline" className="border-destructive text-destructive hover:bg-destructive/10 hover:text-destructive" onClick={() => openRevokeModal(booking.id)}>
-                                                        <RefreshCw className="mr-2 size-4" /> Revoke Approval
-                                                    </Button>
-                                                )}
-                                            </div>
-                                        </div>
-                                    </CardContent>
-                                </Card>
-                            );
-                        })
-                        )}
-                    </div>
-
-                    {/* Rejection Modal */}
-                    {isRejectModalOpen && (
-                        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/45 p-4 backdrop-blur-sm">
-                            <Card className="w-full max-w-md">
-                                <CardHeader>
-                                    <CardTitle>Reject Booking</CardTitle>
-                                    <CardDescription>Please provide a reason visible to the user.</CardDescription>
-                                </CardHeader>
-                                <CardContent className="space-y-4">
-                                    <textarea
-                                        className="flex min-h-[100px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                                        placeholder="e.g. Schedule conflict, Maintenance scheduled..."
-                                        value={rejectionReason}
-                                        onChange={(e) => setRejectionReason(e.target.value)}
-                                    />
-                                    <div className="flex gap-2">
-                                        <Button variant="outline" className="flex-1" onClick={() => setIsRejectModalOpen(false)}>Cancel</Button>
-                                        <Button variant="destructive" className="flex-1" onClick={handleReject}>Confirm Reject</Button>
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        </div>
-                    )}
-                    {isOverrideModalOpen && (
-                        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/45 p-4 backdrop-blur-sm">
-                            <Card className="w-full max-w-md">
-                                <CardHeader>
-                                    <CardTitle>Capacity Override Approval</CardTitle>
-                                    <CardDescription>
-                                        This booking exceeds remaining slot capacity. Add a reason to continue.
-                                    </CardDescription>
-                                </CardHeader>
-                                <CardContent className="space-y-4">
-                                    {selectedBookingForOverride && (
-                                        <div className="rounded-md border border-amber-500/30 bg-amber-500/10 p-3 text-xs text-amber-700">
-                                            Resource: {selectedBookingForOverride.resourceName} <br />
-                                            Time: {selectedBookingForOverride.date} {selectedBookingForOverride.startTime} - {selectedBookingForOverride.endTime}
-                                        </div>
-                                    )}
-                                    <textarea
-                                        className="flex min-h-[100px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                                        placeholder="e.g. Special event priority, emergency access..."
-                                        value={overrideReason}
-                                        onChange={(e) => setOverrideReason(e.target.value)}
-                                    />
-                                    <div className="flex gap-2">
-                                        <Button
-                                            variant="outline"
-                                            className="flex-1"
-                                            onClick={() => {
-                                                setIsOverrideModalOpen(false);
-                                                setSelectedBookingForOverride(null);
-                                                setOverrideReason('');
-                                            }}
-                                        >
-                                            Cancel
-                                        </Button>
-                                        <Button
-                                            className="flex-1"
-                                            onClick={() => handleApprove(selectedBookingForOverride?.id, { forceOverride: true, overrideReason })}
-                                        >
-                                            Approve with Override
-                                        </Button>
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        </div>
-                    )}
-                    {isRevokeModalOpen && (
-                        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/45 p-4 backdrop-blur-sm">
-                            <Card className="w-full max-w-md">
-                                <CardHeader>
-                                    <CardTitle>Revoke Approval</CardTitle>
-                                    <CardDescription>Are you sure you want to revert this booking to Pending? You must provide a reason.</CardDescription>
-                                </CardHeader>
-                                <CardContent className="space-y-4">
-                                    <textarea
-                                        className="flex min-h-[100px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                                        placeholder="e.g. Needs further review, Resource unavailable..."
-                                        value={revokeReason}
-                                        onChange={(e) => setRevokeReason(e.target.value)}
-                                    />
-                                    <div className="flex gap-2">
-                                        <Button variant="outline" className="flex-1" onClick={() => setIsRevokeModalOpen(false)}>Cancel</Button>
-                                        <Button variant="destructive" className="flex-1" onClick={handleRevoke}>Confirm Revoke</Button>
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        </div>
-                    )}
                 </div>
+            )}
+
+            {isRevokeModalOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-md p-4 animate-in fade-in duration-300">
+                    <Card className="w-full max-w-md border-none shadow-2xl rounded-[2.5rem] overflow-hidden bg-white dark:bg-slate-900">
+                        <div className="p-8 border-b border-border/50 bg-rose-500/5 text-rose-500">
+                            <h3 className="text-2xl font-black flex items-center gap-3"><RefreshCw className="size-6" /> Revoke Privilege</h3>
+                            <p className="text-sm font-medium opacity-80 mt-1">Revert authorized state to pending. This action is logged.</p>
+                        </div>
+                        <CardContent className="p-8 space-y-6">
+                            <textarea
+                                className="flex min-h-[120px] w-full rounded-2xl border border-border/50 bg-slate-50 dark:bg-slate-950 px-4 py-3 text-sm font-medium focus:ring-2 focus:ring-rose-500 transition-all outline-none"
+                                placeholder="Justification for revoking approved status..."
+                                value={revokeReason}
+                                onChange={(e) => setRevokeReason(e.target.value)}
+                            />
+                            <div className="flex gap-3">
+                                <Button variant="ghost" className="flex-1 h-12 rounded-xl font-bold" onClick={() => setIsRevokeModalOpen(false)}>Discard</Button>
+                                <Button className="flex-1 h-12 rounded-xl bg-rose-600 hover:bg-rose-500 font-black shadow-xl shadow-rose-500/20" onClick={handleRevoke}>Confirm Revoke</Button>
+                            </div>
+                        </CardContent>
+                    </Card>
+                </div>
+            )}
+        </div>
     );
 
     return content;

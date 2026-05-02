@@ -1,8 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { ResourceStatuses, ResourceTypes, formatResourceTypeLabel, getResourceCapacity } from '../types/resource';
 import { createResource, updateResource } from '../api/resourceApi';
-import { X, Save } from 'lucide-react';
+import { X, Save, Building2, MapPin, Users, Activity, FileText, ImageIcon, Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 
 export const ResourceForm = ({ resource, onClose, onSuccess }) => {
   const [formData, setFormData] = useState({
@@ -65,178 +70,186 @@ export const ResourceForm = ({ resource, onClose, onSuccess }) => {
       ...prev,
       [name]: name === 'capacity' ? parseInt(value) || 0 : value
     }));
-    // Clear error
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
   };
 
   return (
-    <div className="modal-overlay">
-      <div className="modal-content glass-panel" style={{ background: 'var(--bg-secondary)', padding: '2rem' }}>
-        <div className="modal-header">
-          <h2 style={{ fontSize: '1.5rem', fontWeight: 600 }}>
-            {resource ? 'Edit Resource' : 'Add New Resource'}
-          </h2>
-          <button className="modal-close" onClick={onClose}>
-            <X size={24} />
-          </button>
-        </div>
+    <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto">
+      <Card className="max-w-2xl w-full bg-slate-900 border-slate-800 shadow-2xl animate-in zoom-in-95 duration-300">
+        <CardHeader className="border-b border-slate-800/50 pb-6 relative">
+          <div className="flex items-center gap-3 text-teal-400 font-bold uppercase text-[10px] tracking-widest mb-1">
+            <Building2 className="size-3.5" />
+            <span>Resource Management</span>
+          </div>
+          <CardTitle className="text-2xl font-black text-white">
+            {resource ? 'Update Existing Asset' : 'Register New Asset'}
+          </CardTitle>
+          <CardDescription className="text-slate-400">
+            {resource ? 'Modify the details for this campus resource.' : 'Add a new facility or technical equipment to the catalogue.'}
+          </CardDescription>
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="absolute right-4 top-4 text-slate-500 hover:text-white"
+            onClick={onClose}
+          >
+            <X className="size-5" />
+          </Button>
+        </CardHeader>
 
         <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label className="form-label">Name</label>
-            <input
-              type="text"
-              name="name"
-              className="form-control"
-              value={formData.name}
-              onChange={handleChange}
-              placeholder="e.g. Computing Lab 01"
-            />
-            {errors.name && <div className="error-text">{errors.name}</div>}
-          </div>
+          <CardContent className="p-8 space-y-6">
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="name" className="text-xs font-bold uppercase tracking-wider text-slate-500">Asset Name</Label>
+                <div className="relative">
+                  <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-500" />
+                  <Input
+                    id="name"
+                    name="name"
+                    className="pl-10 bg-slate-950/50 border-slate-800 h-11"
+                    value={formData.name}
+                    onChange={handleChange}
+                    placeholder="e.g. Computing Lab 01"
+                  />
+                </div>
+                {errors.name && <p className="text-rose-500 text-xs font-medium">{errors.name}</p>}
+              </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-            <div className="form-group">
-              <label className="form-label">Resource Type</label>
-              <select name="type" className="form-control" value={formData.type} onChange={handleChange}>
-                {Object.values(ResourceTypes).map(t => (
-                  <option key={t} value={t}>{formatResourceTypeLabel(t)}</option>
-                ))}
-              </select>
-            </div>
-            <div className="form-group">
-              <label className="form-label">Status</label>
-              <select name="status" className="form-control" value={formData.status} onChange={handleChange}>
-                {Object.values(ResourceStatuses).map(s => (
-                  <option key={s} value={s}>{s}</option>
-                ))}
-              </select>
-            </div>
-          </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="type" className="text-xs font-bold uppercase tracking-wider text-slate-500">Resource Category</Label>
+                  <div className="relative">
+                    <Layers className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-500 pointer-events-none" />
+                    <select 
+                      id="type"
+                      name="type" 
+                      className="w-full pl-10 h-11 bg-slate-950/50 border border-slate-800 rounded-md text-sm text-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-500/50" 
+                      value={formData.type} 
+                      onChange={handleChange}
+                    >
+                      {Object.values(ResourceTypes).map(t => (
+                        <option key={t} value={t}>{formatResourceTypeLabel(t)}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="status" className="text-xs font-bold uppercase tracking-wider text-slate-500">Operational Status</Label>
+                  <div className="relative">
+                    <Activity className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-500 pointer-events-none" />
+                    <select 
+                      id="status"
+                      name="status" 
+                      className="w-full pl-10 h-11 bg-slate-950/50 border border-slate-800 rounded-md text-sm text-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-500/50" 
+                      value={formData.status} 
+                      onChange={handleChange}
+                    >
+                      {Object.values(ResourceStatuses).map(s => (
+                        <option key={s} value={s}>{s}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+              </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-            <div className="form-group">
-              <label className="form-label">Maximum Capacity</label>
-              <input
-                type="number"
-                name="capacity"
-                className="form-control"
-                value={formData.capacity}
-                onChange={handleChange}
-                min={1}
-              />
-              {errors.capacity && <div className="error-text">{errors.capacity}</div>}
-            </div>
-            <div className="form-group">
-              <label className="form-label">Location</label>
-              <input
-                type="text"
-                name="location"
-                className="form-control"
-                value={formData.location}
-                onChange={handleChange}
-                placeholder="e.g. Building A, Floor 2"
-              />
-              {errors.location && <div className="error-text">{errors.location}</div>}
-            </div>
-          </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="capacity" className="text-xs font-bold uppercase tracking-wider text-slate-500">Max Occupancy</Label>
+                  <div className="relative">
+                    <Users className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-500" />
+                    <Input
+                      id="capacity"
+                      type="number"
+                      name="capacity"
+                      className="pl-10 bg-slate-950/50 border-slate-800 h-11"
+                      value={formData.capacity}
+                      onChange={handleChange}
+                      min={1}
+                    />
+                  </div>
+                  {errors.capacity && <p className="text-rose-500 text-xs font-medium">{errors.capacity}</p>}
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="location" className="text-xs font-bold uppercase tracking-wider text-slate-500">Campus Location</Label>
+                  <div className="relative">
+                    <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-500" />
+                    <Input
+                      id="location"
+                      name="location"
+                      className="pl-10 bg-slate-950/50 border-slate-800 h-11"
+                      value={formData.location}
+                      onChange={handleChange}
+                      placeholder="e.g. Building A, Floor 2"
+                    />
+                  </div>
+                  {errors.location && <p className="text-rose-500 text-xs font-medium">{errors.location}</p>}
+                </div>
+              </div>
 
-          <div className="form-group" style={{ marginBottom: '1.5rem' }}>
-            <label className="form-label">Resource Availability</label>
-            <div 
-              style={{ 
-                display: 'flex', 
-                alignItems: 'center', 
-                gap: '1rem', 
-                padding: '0.75rem', 
-                background: 'var(--bg-primary)', 
-                borderRadius: '8px',
-                cursor: 'pointer',
-                border: `1px solid ${formData.available ? 'var(--success)' : 'var(--border-color)'}`
-              }}
-              onClick={() => setFormData(p => ({ ...p, available: !p.available }))}
-            >
-              <input 
-                type="checkbox" 
-                checked={formData.available} 
-                onChange={() => {}} // Handled by div click
-                style={{ width: '18px', height: '18px', cursor: 'pointer' }}
-              />
-              <span style={{ fontWeight: 500, color: formData.available ? 'var(--success)' : 'var(--text-secondary)' }}>
-                {formData.available ? 'Available for Use / Booking' : 'Not Available (Private/Scheduled)'}
-              </span>
-            </div>
-          </div>
+              <div className="space-y-2">
+                <Label className="text-xs font-bold uppercase tracking-wider text-slate-500">Public Availability</Label>
+                <div 
+                  className={`flex items-center gap-3 p-3 rounded-xl border transition-all cursor-pointer ${
+                    formData.available 
+                      ? 'bg-teal-500/5 border-teal-500/30 text-teal-400' 
+                      : 'bg-slate-950 border-slate-800 text-slate-500'
+                  }`}
+                  onClick={() => setFormData(p => ({ ...p, available: !p.available }))}
+                >
+                  <div className={`size-5 rounded border flex items-center justify-center transition-colors ${
+                    formData.available ? 'bg-teal-500 border-teal-500' : 'bg-transparent border-slate-700'
+                  }`}>
+                    {formData.available && <X className="size-3 text-slate-900 stroke-[4px]" />}
+                  </div>
+                  <span className="text-sm font-bold">
+                    {formData.available ? 'Publicly visible and open for booking' : 'Private asset (Hidden from student catalogue)'}
+                  </span>
+                </div>
+              </div>
 
-          <div className="form-group">
-            <label className="form-label">Image URL</label>
-            {formData.imageUrl && (
-              <div className="image-preview" style={{ 
-                height: '150px', 
-                marginBottom: '1rem', 
-                borderRadius: '8px', 
-                overflow: 'hidden',
-                border: '1px solid var(--border-color)',
-                background: '#1a1a24'
-              }}>
-                <img 
-                  src={formData.imageUrl} 
-                  alt="Preview" 
-                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                  onError={(e) => {
-                    e.currentTarget.src = 'https://via.placeholder.com/400x200?text=Invalid+Image+URL';
-                  }}
+              <div className="space-y-2">
+                <Label htmlFor="imageUrl" className="text-xs font-bold uppercase tracking-wider text-slate-500">Visual Identity (Image URL)</Label>
+                <div className="relative">
+                  <ImageIcon className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-500" />
+                  <Input
+                    id="imageUrl"
+                    name="imageUrl"
+                    className="pl-10 bg-slate-950/50 border-slate-800 h-11"
+                    value={formData.imageUrl || ''}
+                    onChange={handleChange}
+                    placeholder="https://images.unsplash.com/photo-..."
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="description" className="text-xs font-bold uppercase tracking-wider text-slate-500">Detailed Description</Label>
+                <textarea
+                  id="description"
+                  name="description"
+                  className="flex min-h-[100px] w-full rounded-md border border-slate-800 bg-slate-950/50 px-3 py-2 text-sm text-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-500/50"
+                  value={formData.description || ''}
+                  onChange={(e) => setFormData(p => ({ ...p, description: e.target.value }))}
+                  placeholder="Enter detailed technical specifications or facility rules..."
                 />
               </div>
-            )}
-            <input
-              type="text"
-              name="imageUrl"
-              className="form-control"
-              value={formData.imageUrl || ''}
-              onChange={handleChange}
-              placeholder="https://images.unsplash.com/photo-..."
-            />
-          </div>
+            </div>
+          </CardContent>
 
-          <div className="form-group">
-            <label className="form-label">Description (Optional)</label>
-            <textarea
-              name="description"
-              className="form-control"
-              value={formData.description || ''}
-              onChange={(e) => setFormData(p => ({ ...p, description: e.target.value }))}
-              placeholder="Enter resource description..."
-              rows={3}
-              style={{ background: 'var(--bg-primary)', color: 'var(--text-primary)', border: '1px solid var(--border-color)', borderRadius: '8px', padding: '0.75rem', width: '100%' }}
-            />
-          </div>
-
-          <div className="form-group">
-            <label className="form-label">Download/Document URL (Optional)</label>
-            <input
-              type="text"
-              name="downloadUrl"
-              className="form-control"
-              value={formData.downloadUrl || ''}
-              onChange={handleChange}
-              placeholder="https://example.com/resource.pdf"
-            />
-          </div>
-
-          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', marginTop: '2rem' }}>
-            <button type="button" className="btn btn-secondary" onClick={onClose} disabled={loading}>
+          <CardFooter className="p-8 border-t border-slate-800/50 bg-slate-950/30 flex justify-end gap-3 rounded-b-2xl">
+            <Button type="button" variant="ghost" className="text-slate-400 hover:text-white" onClick={onClose} disabled={loading}>
               Cancel
-            </button>
-            <button type="submit" className="btn btn-primary" disabled={loading}>
-              <Save size={18} />
-              {loading ? 'Saving...' : 'Save Resource'}
-            </button>
-          </div>
+            </Button>
+            <Button type="submit" className="bg-teal-600 hover:bg-teal-700 font-bold gap-2 px-8 shadow-lg shadow-teal-600/20" disabled={loading}>
+              {loading ? <Loader2 className="size-4 animate-spin" /> : <Save className="size-4" />}
+              {resource ? 'Update Resource' : 'Register Resource'}
+            </Button>
+          </CardFooter>
         </form>
-      </div>
+      </Card>
     </div>
   );
 };

@@ -2,10 +2,17 @@ import React, { useMemo, useState, useEffect } from 'react';
 import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, AreaChart, Area } from 'recharts';
 import { getAllBookings } from '../api/bookingApi';
 import { getResources } from '../api/resourceApi';
-import { LayoutDashboard, TrendingUp, Users, Clock, Coffee, FileText, AlertTriangle } from 'lucide-react';
+import { 
+  LayoutDashboard, TrendingUp, Users, Clock, Coffee, 
+  FileText, AlertTriangle, Calendar, Filter, Activity,
+  ChevronDown, ArrowUpRight, BarChart3, PieChart as PieChartIcon
+} from 'lucide-react';
 import toast from 'react-hot-toast';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
-const COLORS = ['#6366f1', '#8b5cf6', '#ec4899', '#f43f5e', '#f59e0b', '#10b981', '#06b6d4'];
+const COLORS = ['#3b82f6', '#8b5cf6', '#ec4899', '#f43f5e', '#f59e0b', '#10b981', '#06b6d4'];
 const COUNTABLE_STATUSES = new Set(['PENDING', 'APPROVED']);
 
 const formatDateLabel = (dateStr) => {
@@ -124,196 +131,234 @@ export const AdminAnalyticsDashboard = () => {
 
     const resourceTypes = [...new Set(resources.map((resource) => resource.type).filter(Boolean))];
 
-    if (loading) return <div className="spinner-container"><div className="spinner"></div></div>;
-    if (!bookings.length) return <div className="error-msg">No analytics data available.</div>;
+    if (loading) {
+      return (
+        <div className="py-40 flex flex-col items-center justify-center space-y-4">
+          <div className="size-12 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
+          <p className="text-xs font-black uppercase tracking-widest text-muted-foreground animate-pulse">Aggregating Intelligence...</p>
+        </div>
+      );
+    }
 
     return (
-        <div className="container animate-fade">
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '2rem' }}>
-                <LayoutDashboard size={32} color="var(--accent-color)" />
-                <h1 className="page-title" style={{ margin: 0 }}>Booking Analytics Dashboard</h1>
-            </div>
+        <div className="space-y-8 pb-20 animate-in fade-in duration-700">
+            {/* Premium Header */}
+            <div className="flex flex-col lg:flex-row gap-6 items-start lg:items-center justify-between px-2">
+                <div className="space-y-2">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/10 text-[10px] font-black uppercase tracking-widest text-blue-500">
+                        <Activity className="size-3" />
+                        System Intelligence Portal
+                    </div>
+                    <h1 className="text-4xl font-black tracking-tight text-slate-900 dark:text-slate-50">Operations Analytics</h1>
+                    <p className="text-sm font-medium text-muted-foreground">Real-time telemetry and resource utilization metrics.</p>
+                </div>
 
-            <div className="glass-panel" style={{ padding: '1rem', marginBottom: '1.5rem', display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-                <div>
-                    <label style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>Date Range</label>
-                    <select
-                        className="form-control"
-                        value={rangeDays}
-                        onChange={(e) => setRangeDays(Number(e.target.value))}
-                        style={{ minWidth: '180px' }}
-                    >
-                        <option value={7}>Last 7 days</option>
-                        <option value={14}>Last 14 days</option>
-                        <option value={30}>Last 30 days</option>
-                        <option value={90}>Last 90 days</option>
-                    </select>
-                </div>
-                <div>
-                    <label style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>Resource Type</label>
-                    <select
-                        className="form-control"
-                        value={typeFilter}
-                        onChange={(e) => setTypeFilter(e.target.value)}
-                        style={{ minWidth: '200px' }}
-                    >
-                        <option value="ALL">All Types</option>
-                        {resourceTypes.map((type) => (
-                            <option key={type} value={type}>{String(type).replace(/_/g, ' ')}</option>
-                        ))}
-                    </select>
-                </div>
-            </div>
-
-            {/* Stats Overview */}
-            <div className="stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.5rem', marginBottom: '2rem' }}>
-                <div className="glass-panel stat-card" style={{ padding: '1.5rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                    <div style={{ background: 'rgba(99, 102, 241, 0.1)', padding: '12px', borderRadius: '12px' }}>
-                        <FileText color="var(--accent-color)" size={24} />
+                <div className="flex flex-wrap gap-4 w-full lg:w-auto">
+                    <div className="relative group">
+                        <label className="absolute -top-2 left-3 px-1 bg-white dark:bg-slate-950 text-[9px] font-black uppercase tracking-widest text-muted-foreground z-10">Timeframe</label>
+                        <select
+                            className="h-12 rounded-xl border border-border bg-white dark:bg-slate-900 pl-4 pr-10 text-xs font-bold focus:ring-2 focus:ring-blue-500 outline-none transition-all shadow-xl appearance-none min-w-[160px]"
+                            value={rangeDays}
+                            onChange={(e) => setRangeDays(Number(e.target.value))}
+                        >
+                            <option value={7}>Last 7 Cycles</option>
+                            <option value={14}>Last 14 Cycles</option>
+                            <option value={30}>Monthly Overview</option>
+                            <option value={90}>Quarterly Audit</option>
+                        </select>
+                        <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
                     </div>
-                    <div>
-                        <div style={{ fontSize: '1.8rem', fontWeight: 'bold' }}>{filteredBookings.length}</div>
-                        <div style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>Total Requests</div>
-                    </div>
-                </div>
-                <div className="glass-panel stat-card" style={{ padding: '1.5rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                    <div style={{ background: 'rgba(16, 185, 129, 0.1)', padding: '12px', borderRadius: '12px' }}>
-                        <TrendingUp color="var(--success)" size={24} />
-                    </div>
-                    <div>
-                        <div style={{ fontSize: '1.8rem', fontWeight: 'bold' }}>{totalSeatsConsumed}</div>
-                        <div style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>Seats Consumed</div>
-                    </div>
-                </div>
-                <div className="glass-panel stat-card" style={{ padding: '1.5rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                    <div style={{ background: 'rgba(245, 158, 11, 0.12)', padding: '12px', borderRadius: '12px' }}>
-                        <Clock color="#f59e0b" size={24} />
-                    </div>
-                    <div>
-                        <div style={{ fontSize: '1.8rem', fontWeight: 'bold' }}>{hourlyUsage.length ? hourlyUsage.reduce((max, item) => Math.max(max, item.seats), 0) : 0}</div>
-                        <div style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>Peak Hour Seats</div>
-                    </div>
-                </div>
-                <div className="glass-panel stat-card" style={{ padding: '1.5rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                    <div style={{ background: 'rgba(244, 63, 94, 0.12)', padding: '12px', borderRadius: '12px' }}>
-                        <AlertTriangle color="#f43f5e" size={24} />
-                    </div>
-                    <div>
-                        <div style={{ fontSize: '1.8rem', fontWeight: 'bold' }}>{capacityAlerts}</div>
-                        <div style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>High Usage Alerts</div>
+                    
+                    <div className="relative group">
+                        <label className="absolute -top-2 left-3 px-1 bg-white dark:bg-slate-950 text-[9px] font-black uppercase tracking-widest text-muted-foreground z-10">Resource Filter</label>
+                        <select
+                            className="h-12 rounded-xl border border-border bg-white dark:bg-slate-900 pl-4 pr-10 text-xs font-bold focus:ring-2 focus:ring-blue-500 outline-none transition-all shadow-xl appearance-none min-w-[200px]"
+                            value={typeFilter}
+                            onChange={(e) => setTypeFilter(e.target.value)}
+                        >
+                            <option value="ALL">All Asset Types</option>
+                            {resourceTypes.map((type) => (
+                                <option key={type} value={type}>{String(type).replace(/_/g, ' ')}</option>
+                            ))}
+                        </select>
+                        <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
                     </div>
                 </div>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(450px, 1fr))', gap: '2rem' }}>
-                {/* Daily trend */}
-                <div className="glass-panel" style={{ padding: '1.5rem' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '1.5rem' }}>
-                        <Coffee size={20} color="var(--accent-color)" />
-                        <h3 style={{ margin: 0 }}>Daily Capacity Consumption</h3>
-                    </div>
-                    <div style={{ height: '300px' }}>
-                        <ResponsiveContainer width="100%" height="100%">
-                            <AreaChart data={dailyTrend}>
-                                <defs>
-                                    <linearGradient id="dailySeats" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3}/>
-                                        <stop offset="95%" stopColor="#6366f1" stopOpacity={0}/>
-                                    </linearGradient>
-                                </defs>
-                                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
-                                <XAxis dataKey="date" stroke="var(--text-secondary)" fontSize={12} tickLine={false} axisLine={false} />
-                                <YAxis stroke="var(--text-secondary)" fontSize={12} tickLine={false} axisLine={false} />
-                                <Tooltip 
-                                    contentStyle={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-color)', borderRadius: '8px' }}
-                                    itemStyle={{ color: 'var(--text-primary)' }}
-                                />
-                                <Legend />
-                                <Area type="monotone" dataKey="seats" stroke="#6366f1" fillOpacity={1} fill="url(#dailySeats)" strokeWidth={3} name="Seats used" />
-                                <Area type="monotone" dataKey="bookings" stroke="#10b981" fillOpacity={0} strokeWidth={2} name="Requests" />
-                            </AreaChart>
-                        </ResponsiveContainer>
-                    </div>
-                </div>
+            {/* High-Impact Stat Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 px-1">
+                {[
+                    { label: 'Total Requests', value: filteredBookings.length, icon: FileText, color: 'text-blue-500', bg: 'bg-blue-500/10', trend: '+12% vs last' },
+                    { label: 'Seats Consumed', value: totalSeatsConsumed, icon: Users, color: 'text-emerald-500', bg: 'bg-emerald-500/10', trend: 'Active Utilization' },
+                    { label: 'Peak Saturation', value: hourlyUsage.length ? hourlyUsage.reduce((max, item) => Math.max(max, item.seats), 0) : 0, icon: Clock, color: 'text-amber-500', bg: 'bg-amber-500/10', trend: 'Critical Hours' },
+                    { label: 'Usage Alerts', value: capacityAlerts, icon: AlertTriangle, color: 'text-rose-500', bg: 'bg-rose-500/10', trend: 'Needs Review' }
+                ].map((stat, i) => (
+                    <Card key={i} className="border-none shadow-2xl rounded-[2rem] overflow-hidden bg-white dark:bg-slate-900 group transition-all hover:-translate-y-1">
+                        <CardContent className="p-6">
+                            <div className="flex items-start justify-between">
+                                <div className={cn("p-4 rounded-2xl shadow-inner", stat.bg)}>
+                                    <stat.icon className={cn("size-6", stat.color)} />
+                                </div>
+                                <div className="text-right">
+                                    <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1">{stat.label}</p>
+                                    <h4 className="text-3xl font-black tracking-tighter text-slate-900 dark:text-slate-100">{stat.value}</h4>
+                                    <div className="flex items-center gap-1 text-[9px] font-bold text-emerald-500 mt-2">
+                                        <ArrowUpRight className="size-3" />
+                                        {stat.trend}
+                                    </div>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+                ))}
+            </div>
 
-                {/* Peak Hours */}
-                <div className="glass-panel" style={{ padding: '1.5rem' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '1.5rem' }}>
-                        <Clock size={20} color="var(--accent-color)" />
-                        <h3 style={{ margin: 0 }}>Peak Booking Hours</h3>
-                    </div>
-                    <div style={{ height: '300px' }}>
-                        <ResponsiveContainer width="100%" height="100%">
-                            <BarChart data={hourlyUsage}>
-                                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
-                                <XAxis dataKey="hour" stroke="var(--text-secondary)" fontSize={12} tickLine={false} axisLine={false} />
-                                <YAxis stroke="var(--text-secondary)" fontSize={12} tickLine={false} axisLine={false} />
-                                <Tooltip 
-                                    contentStyle={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-color)', borderRadius: '8px' }}
-                                    itemStyle={{ color: 'var(--text-primary)' }}
-                                />
-                                <Bar dataKey="seats" name="Seats consumed" fill="#8b5cf6" radius={[6, 6, 0, 0]} />
-                            </BarChart>
-                        </ResponsiveContainer>
-                    </div>
-                </div>
+            {/* Main Visual Intelligence Grid */}
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 px-1">
+                {/* Daily Trend Analysis */}
+                <Card className="border-none shadow-2xl rounded-[2.5rem] overflow-hidden bg-white dark:bg-slate-900">
+                    <CardHeader className="p-8 pb-0">
+                        <div className="flex items-center gap-4">
+                           <div className="size-10 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-500">
+                               <TrendingUp className="size-5" />
+                           </div>
+                           <div>
+                               <CardTitle className="text-xl font-black">Capacity Flux Analysis</CardTitle>
+                               <CardDescription>Daily seat consumption and request volume trends.</CardDescription>
+                           </div>
+                        </div>
+                    </CardHeader>
+                    <CardContent className="p-8">
+                        <div className="h-[350px] w-full">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <AreaChart data={dailyTrend}>
+                                    <defs>
+                                        <linearGradient id="colorSeats" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3}/>
+                                            <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+                                        </linearGradient>
+                                    </defs>
+                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" opacity={0.5} />
+                                    <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fontSize: 10, fontWeight: 700, fill: '#64748b' }} dy={10} />
+                                    <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fontWeight: 700, fill: '#64748b' }} dx={-10} />
+                                    <Tooltip 
+                                        contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.1)', fontWeight: 700 }}
+                                    />
+                                    <Area type="monotone" dataKey="seats" stroke="#3b82f6" strokeWidth={4} fillOpacity={1} fill="url(#colorSeats)" name="Seats Reserved" />
+                                    <Area type="monotone" dataKey="bookings" stroke="#10b981" strokeWidth={3} fillOpacity={0} name="Requests" />
+                                </AreaChart>
+                            </ResponsiveContainer>
+                        </div>
+                    </CardContent>
+                </Card>
 
-                {/* Most booked resources */}
-                <div className="glass-panel" style={{ padding: '1.5rem' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '1.5rem' }}>
-                        <Users size={20} color="var(--accent-color)" />
-                        <h3 style={{ margin: 0 }}>Most Booked Resources</h3>
-                    </div>
-                    <div style={{ height: '300px' }}>
-                        <ResponsiveContainer width="100%" height="100%">
-                            <BarChart data={topResources} layout="vertical" margin={{ left: 18, right: 14 }}>
-                                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" horizontal={false} />
-                                <XAxis type="number" stroke="var(--text-secondary)" fontSize={12} tickLine={false} axisLine={false} />
-                                <YAxis type="category" dataKey="name" width={150} stroke="var(--text-secondary)" fontSize={12} tickLine={false} axisLine={false} />
-                                <Tooltip
-                                    contentStyle={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-color)', borderRadius: '8px' }}
-                                    itemStyle={{ color: 'var(--text-primary)' }}
-                                />
-                                <Legend />
-                                <Bar dataKey="seats" name="Seats" fill="#6366f1" radius={[0, 6, 6, 0]} />
-                                <Bar dataKey="bookings" name="Requests" fill="#10b981" radius={[0, 6, 6, 0]} />
-                            </BarChart>
-                        </ResponsiveContainer>
-                    </div>
-                </div>
+                {/* Peak Hours Histogram */}
+                <Card className="border-none shadow-2xl rounded-[2.5rem] overflow-hidden bg-white dark:bg-slate-900">
+                    <CardHeader className="p-8 pb-0">
+                        <div className="flex items-center gap-4">
+                           <div className="size-10 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-500">
+                               <Clock className="size-5" />
+                           </div>
+                           <div>
+                               <CardTitle className="text-xl font-black">Temporal Load Density</CardTitle>
+                               <CardDescription>Identifying peak operational hours across the campus.</CardDescription>
+                           </div>
+                        </div>
+                    </CardHeader>
+                    <CardContent className="p-8">
+                        <div className="h-[350px] w-full">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <BarChart data={hourlyUsage}>
+                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" opacity={0.5} />
+                                    <XAxis dataKey="hour" axisLine={false} tickLine={false} tick={{ fontSize: 10, fontWeight: 700, fill: '#64748b' }} dy={10} />
+                                    <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fontWeight: 700, fill: '#64748b' }} dx={-10} />
+                                    <Tooltip 
+                                        cursor={{ fill: 'rgba(59, 130, 246, 0.05)', radius: 8 }}
+                                        contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.1)', fontWeight: 700 }}
+                                    />
+                                    <Bar dataKey="seats" fill="#8b5cf6" radius={[6, 6, 0, 0]} name="Consumption Density" barSize={30} />
+                                </BarChart>
+                            </ResponsiveContainer>
+                        </div>
+                    </CardContent>
+                </Card>
 
-                {/* Status distribution */}
-                <div className="glass-panel" style={{ padding: '1.5rem' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '1.5rem' }}>
-                        <FileText size={20} color="var(--accent-color)" />
-                        <h3 style={{ margin: 0 }}>Booking Status Distribution</h3>
-                    </div>
-                    <div style={{ height: '300px' }}>
-                        <ResponsiveContainer width="100%" height="100%">
-                            <PieChart>
-                                <Pie
-                                    data={statusData}
-                                    cx="50%"
-                                    cy="50%"
-                                    innerRadius={60}
-                                    outerRadius={88}
-                                    paddingAngle={3}
-                                    dataKey="value"
-                                    label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
-                                >
-                                    {statusData.map((entry, index) => (
-                                        <Cell key={`cell-status-${index}`} fill={COLORS[index % COLORS.length]} />
-                                    ))}
-                                </Pie>
-                                <Tooltip
-                                    contentStyle={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-color)', borderRadius: '8px' }}
-                                    itemStyle={{ color: 'var(--text-primary)' }}
-                                />
-                                <Legend />
-                            </PieChart>
-                        </ResponsiveContainer>
-                    </div>
-                </div>
+                {/* Top Resources Ranking */}
+                <Card className="border-none shadow-2xl rounded-[2.5rem] overflow-hidden bg-white dark:bg-slate-900">
+                    <CardHeader className="p-8 pb-0">
+                        <div className="flex items-center gap-4">
+                           <div className="size-10 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500">
+                               <BarChart3 className="size-5" />
+                           </div>
+                           <div>
+                               <CardTitle className="text-xl font-black">High-Demand Assets</CardTitle>
+                               <CardDescription>Top resources by aggregate seat reservation volume.</CardDescription>
+                           </div>
+                        </div>
+                    </CardHeader>
+                    <CardContent className="p-8">
+                        <div className="h-[350px] w-full">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <BarChart data={topResources} layout="vertical">
+                                    <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#e2e8f0" opacity={0.5} />
+                                    <XAxis type="number" hide />
+                                    <YAxis type="category" dataKey="name" width={120} axisLine={false} tickLine={false} tick={{ fontSize: 10, fontWeight: 700, fill: '#64748b' }} />
+                                    <Tooltip 
+                                        contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.1)', fontWeight: 700 }}
+                                    />
+                                    <Bar dataKey="seats" fill="#3b82f6" radius={[0, 6, 6, 0]} name="Aggregate Capacity" barSize={20} />
+                                    <Bar dataKey="bookings" fill="#10b981" radius={[0, 6, 6, 0]} name="Booking Frequency" barSize={20} />
+                                </BarChart>
+                            </ResponsiveContainer>
+                        </div>
+                    </CardContent>
+                </Card>
+
+                {/* Status Allocation */}
+                <Card className="border-none shadow-2xl rounded-[2.5rem] overflow-hidden bg-white dark:bg-slate-900">
+                    <CardHeader className="p-8 pb-0">
+                        <div className="flex items-center gap-4">
+                           <div className="size-10 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-500">
+                               <PieChartIcon className="size-5" />
+                           </div>
+                           <div>
+                               <CardTitle className="text-xl font-black">Lifecycle Distribution</CardTitle>
+                               <CardDescription>Breakdown of reservation requests by operational state.</CardDescription>
+                           </div>
+                        </div>
+                    </CardHeader>
+                    <CardContent className="p-8">
+                        <div className="h-[350px] w-full">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <PieChart>
+                                    <Pie
+                                        data={statusData}
+                                        cx="50%"
+                                        cy="55%"
+                                        innerRadius={80}
+                                        outerRadius={120}
+                                        paddingAngle={8}
+                                        dataKey="value"
+                                        stroke="none"
+                                    >
+                                        {statusData.map((entry, index) => (
+                                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                        ))}
+                                    </Pie>
+                                    <Tooltip 
+                                        contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.1)', fontWeight: 700 }}
+                                    />
+                                    <Legend 
+                                        verticalAlign="top" 
+                                        align="right" 
+                                        wrapperStyle={{ fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '1px' }} 
+                                    />
+                                </PieChart>
+                            </ResponsiveContainer>
+                        </div>
+                    </CardContent>
+                </Card>
             </div>
         </div>
     );

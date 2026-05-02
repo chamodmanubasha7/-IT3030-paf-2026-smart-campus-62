@@ -484,7 +484,7 @@ public class TicketServiceImpl implements TicketService {
         notificationService.createNotification(ticket.getCreatedBy(), message, NotificationType.TICKET, link);
         notificationEmailService.sendNotificationEmail(
                 ticket.getCreatedBy().getEmail(),
-                "Ticket status updated - Smart Campus",
+                "Ticket status updated - Smart Campus Operations Hub",
                 message + "\n\nOpen the app to view details."
         );
     }
@@ -496,7 +496,7 @@ public class TicketServiceImpl implements TicketService {
         notificationService.createNotification(ticket.getCreatedBy(), reporterMessage, NotificationType.TICKET, link);
         notificationEmailService.sendNotificationEmail(
                 ticket.getCreatedBy().getEmail(),
-                "Ticket assigned - Smart Campus",
+                "Ticket assigned - Smart Campus Operations Hub",
                 reporterMessage + "\n\nOpen the app to view details."
         );
 
@@ -505,7 +505,7 @@ public class TicketServiceImpl implements TicketService {
         notificationService.createNotification(technician, technicianMessage, NotificationType.TICKET, link);
         notificationEmailService.sendNotificationEmail(
                 technician.getEmail(),
-                "New ticket assignment - Smart Campus",
+                "New ticket assignment - Smart Campus Operations Hub",
                 technicianMessage + "\n\nOpen the app to view details."
         );
     }
@@ -517,7 +517,7 @@ public class TicketServiceImpl implements TicketService {
         notificationService.createNotification(ticket.getCreatedBy(), message, NotificationType.TICKET, link);
         notificationEmailService.sendNotificationEmail(
                 ticket.getCreatedBy().getEmail(),
-                "Ticket rejected - Smart Campus",
+                "Ticket rejected - Smart Campus Operations Hub",
                 message + "\n\nOpen the app to view details."
         );
     }

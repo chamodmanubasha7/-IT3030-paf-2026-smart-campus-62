@@ -3,12 +3,17 @@ import toast from 'react-hot-toast';
 import { createResource, getResources, updateResource, deleteResource, uploadResourceImage } from '@/api/resourceApi';
 import { getAllBookings } from '@/api/bookingApi';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { MoreVertical, Plus, X } from 'lucide-react';
+import { 
+  MoreVertical, Plus, X, Search, ChevronRight, 
+  Building2, MapPin, Users, Settings2, Trash2, 
+  Eye, EyeOff, LayoutGrid, ListChecks
+} from 'lucide-react';
 import { ResourceStatuses, ResourceTypes, formatResourceTypeLabel, getResourceCapacity } from '@/types/resource';
+import { cn } from '@/lib/utils';
 
 const EMPTY_FORM = {
   name: '',
@@ -50,7 +55,6 @@ const calculatePeakSeatDemandByResource = (bookings = []) => {
   grouped.forEach((events, key) => {
     events.sort((a, b) => {
       if (a.minute !== b.minute) return a.minute - b.minute;
-      // Process end events before start events when times are equal.
       if (a.type === b.type) return 0;
       return a.type === 'end' ? -1 : 1;
     });
@@ -291,114 +295,162 @@ export function AdminResourceManagementPage({ embedded = false }) {
   const hasSelected = selectedIds.length > 0;
 
   const content = (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-          <CardTitle>Assets & Facilities</CardTitle>
-          <div className="flex w-full flex-wrap gap-2 md:w-auto">
+    <div className="space-y-8 pb-20">
+      {/* Header & Controls Area */}
+      <div className="flex flex-col lg:flex-row gap-6 items-start lg:items-center justify-between">
+        <div className="space-y-2">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/10 text-[10px] font-black uppercase tracking-widest text-blue-500">
+            <LayoutGrid className="size-3" />
+            Inventory Master
+          </div>
+          <h2 className="text-3xl font-black tracking-tight text-slate-900 dark:text-slate-50">Assets & Facilities</h2>
+          <p className="text-sm font-medium text-muted-foreground">Managing {resources.length} operational campus resources.</p>
+        </div>
+
+        <div className="flex flex-wrap gap-3 w-full lg:w-auto">
+          <div className="relative group flex-1 min-w-[240px] max-w-sm">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 size-4 text-muted-foreground group-focus-within:text-blue-500 transition-colors" />
             <Input
-              placeholder="Search by name"
+              placeholder="Filter by asset name..."
               value={search}
               onChange={(event) => setSearch(event.target.value)}
-              className="md:w-72"
+              className="pl-11 h-12 rounded-2xl border-border/50 bg-white dark:bg-slate-900 shadow-xl focus:ring-blue-500"
             />
-            <Button variant="outline" onClick={() => setSearch('')}>Reset</Button>
-            <select
-              className="h-10 rounded-md border border-input bg-background px-3 text-sm"
-              value={bulkAction}
-              onChange={(event) => {
-                const action = event.target.value;
-                setBulkAction(action);
-                if (action) handleBulkAction(action);
-              }}
-              disabled={!hasSelected}
-            >
-              <option value="">Bulk actions</option>
-              <option value="SET_OFFLINE">Set Offline</option>
-              <option value="SET_ACTIVE">Set Active</option>
-              <option value="DELETE">Delete Selected</option>
-            </select>
-            <Button onClick={openCreate}>
-              <Plus className="mr-1 size-4" /> Add Asset
-            </Button>
           </div>
-        </CardHeader>
-        <CardContent>
+          <Button 
+            className="h-12 px-6 rounded-2xl bg-blue-600 hover:bg-blue-500 font-black shadow-xl shadow-blue-500/20 transition-all active:scale-95" 
+            onClick={openCreate}
+          >
+            <Plus className="mr-2 size-5" /> Add Asset
+          </Button>
+        </div>
+      </div>
+
+      {/* Bulk Actions Bar */}
+      {hasSelected && (
+        <div className="flex items-center gap-4 p-4 rounded-[2rem] bg-slate-900 text-white shadow-2xl animate-in slide-in-from-top-4 duration-300">
+          <span className="text-xs font-black uppercase tracking-widest ml-4">{selectedIds.length} Assets Selected</span>
+          <div className="h-6 w-px bg-white/20 mx-2" />
+          <div className="flex gap-2">
+            <Button variant="ghost" className="h-9 px-4 text-xs font-bold hover:bg-white/10 text-emerald-400" onClick={() => handleBulkAction('SET_ACTIVE')}>Set Active</Button>
+            <Button variant="ghost" className="h-9 px-4 text-xs font-bold hover:bg-white/10 text-amber-400" onClick={() => handleBulkAction('SET_OFFLINE')}>Go Offline</Button>
+            <Button variant="ghost" className="h-9 px-4 text-xs font-bold hover:bg-rose-500/20 text-rose-400" onClick={() => handleBulkAction('DELETE')}>Purge Assets</Button>
+          </div>
+          <Button variant="ghost" size="icon" className="ml-auto hover:bg-white/10" onClick={() => setSelectedIds([])}><X className="size-4" /></Button>
+        </div>
+      )}
+
+      {/* Main Table Card */}
+      <Card className="border-none shadow-2xl rounded-[2.5rem] overflow-hidden bg-white dark:bg-slate-900">
+        <CardContent className="p-0">
           {loading ? (
-            <p className="text-sm text-slate-500">Loading resources...</p>
+            <div className="py-40 flex flex-col items-center justify-center space-y-4">
+              <div className="size-12 border-4 border-blue-500/20 border-t-blue-500 rounded-full animate-spin" />
+              <p className="text-xs font-black uppercase tracking-widest text-muted-foreground animate-pulse">Syncing Inventory Records...</p>
+            </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full border-collapse text-left text-sm">
                 <thead>
-                  <tr className="border-b">
-                    <th className="py-2 pr-2">
+                  <tr className="bg-slate-50 dark:bg-slate-950/50 border-b border-border/50">
+                    <th className="pl-8 py-6 w-10">
                       <input
                         type="checkbox"
                         checked={allSelected}
                         onChange={(event) => toggleSelectAll(event.target.checked)}
-                        aria-label="Select all resources"
+                        className="size-4 rounded border-slate-300 dark:border-slate-700 text-blue-600 focus:ring-blue-500"
                       />
                     </th>
-                    <th className="py-2 pr-2">Name</th>
-                    <th className="py-2 pr-2">Type</th>
-                    <th className="py-2 pr-2">Location</th>
-                    <th className="py-2 pr-2">Capacity</th>
-                    <th className="py-2 pr-2">Status</th>
-                    <th className="py-2 pr-2">Availability</th>
-                    <th className="py-2 text-right">Actions</th>
+                    <th className="px-6 py-6 text-[10px] font-black uppercase tracking-widest text-muted-foreground">Identity & Name</th>
+                    <th className="px-6 py-6 text-[10px] font-black uppercase tracking-widest text-muted-foreground">Category</th>
+                    <th className="px-6 py-6 text-[10px] font-black uppercase tracking-widest text-muted-foreground">Geography</th>
+                    <th className="px-6 py-6 text-[10px] font-black uppercase tracking-widest text-muted-foreground">Payload</th>
+                    <th className="px-6 py-6 text-[10px] font-black uppercase tracking-widest text-muted-foreground">Visibility</th>
+                    <th className="px-6 py-6 text-[10px] font-black uppercase tracking-widest text-muted-foreground text-right pr-8">Authority</th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody className="divide-y divide-border/30">
                   {resources.length === 0 ? (
                     <tr>
-                      <td colSpan={8} className="py-6 text-center text-slate-500">
-                        No resources found.
+                      <td colSpan={7} className="py-32 text-center text-muted-foreground font-medium italic">
+                        No assets discovered within current filter parameters.
                       </td>
                     </tr>
                   ) : (
                     resources.map((resource) => (
-                      <tr key={resource.id} className="border-b border-slate-100 align-top">
-                        <td className="py-2 pr-2">
+                      <tr key={resource.id} className="group hover:bg-blue-500/5 transition-colors">
+                        <td className="pl-8 py-5">
                           <input
                             type="checkbox"
                             checked={selectedIds.includes(resource.id)}
                             onChange={(event) => toggleSelectOne(resource.id, event.target.checked)}
-                            aria-label={`Select ${resource.name}`}
+                            className="size-4 rounded border-slate-300 dark:border-slate-700 text-blue-600 focus:ring-blue-500"
                           />
                         </td>
-                        <td className="py-2 pr-2 font-medium">{resource.name}</td>
-                        <td className="py-2 pr-2">{formatResourceTypeLabel(resource.type)}</td>
-                        <td className="py-2 pr-2">{resource.location}</td>
-                        <td className="py-2 pr-2">{getResourceCapacity(resource)}</td>
-                        <td className="py-2 pr-2">
-                          <Badge variant={resource.status === 'ACTIVE' ? 'secondary' : 'destructive'}>
-                            {resource.status}
+                        <td className="px-6 py-5">
+                          <div className="flex items-center gap-4">
+                            <div className="size-12 rounded-2xl overflow-hidden bg-slate-100 dark:bg-slate-800 shadow-inner group-hover:scale-105 transition-transform">
+                              {resource.imageUrl ? (
+                                <img src={resource.imageUrl} alt={resource.name} className="size-full object-cover" />
+                              ) : (
+                                <div className="size-full flex items-center justify-center text-slate-400">
+                                  <Building2 className="size-6" />
+                                </div>
+                              )}
+                            </div>
+                            <div className="min-w-0">
+                              <p className="font-black text-slate-900 dark:text-slate-100 truncate">{resource.name}</p>
+                              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mt-0.5">ID: {resource.id.slice(0, 8)}...</p>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-6 py-5">
+                           <Badge variant="outline" className="font-bold border-blue-500/20 text-blue-500 bg-blue-500/5 px-2.5 py-1 text-[10px] uppercase tracking-wider">
+                            {formatResourceTypeLabel(resource.type)}
                           </Badge>
                         </td>
-                        <td className="py-2 pr-2">
-                          <Badge variant={resource.available ? 'outline' : 'destructive'}>
-                            {resource.available ? 'Available' : 'Unavailable'}
-                          </Badge>
+                        <td className="px-6 py-5 font-bold text-slate-600 dark:text-slate-400 flex items-center gap-2">
+                          <MapPin className="size-3.5 text-rose-500" />
+                          {resource.location}
                         </td>
-                        <td className="py-2 text-right">
+                        <td className="px-6 py-5">
+                          <div className="flex items-center gap-2 font-black">
+                            <Users className="size-4 text-indigo-500" />
+                            {getResourceCapacity(resource)} <span className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold">Seats</span>
+                          </div>
+                        </td>
+                        <td className="px-6 py-5">
+                          <div className="flex flex-col gap-1.5">
+                            <div className="flex items-center gap-2">
+                              <div className={cn("size-2 rounded-full", resource.status === 'ACTIVE' ? 'bg-emerald-500 animate-pulse' : 'bg-rose-500')} />
+                              <span className={cn("text-[10px] font-black uppercase tracking-widest", resource.status === 'ACTIVE' ? 'text-emerald-500' : 'text-rose-500')}>
+                                {resource.status}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              {resource.available ? <Eye className="size-3 text-blue-500" /> : <EyeOff className="size-3 text-slate-400" />}
+                              <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest">{resource.available ? 'Live' : 'Hidden'}</span>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-6 py-5 text-right pr-8">
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                              <Button variant="outline" size="icon" aria-label="Open actions">
-                                <MoreVertical className="size-4" />
+                              <Button variant="ghost" size="icon" className="hover:bg-blue-500/10">
+                                <MoreVertical className="size-4 text-muted-foreground" />
                               </Button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuItem onClick={() => openEdit(resource)}>
-                                Edit
+                            <DropdownMenuContent align="end" className="w-56 rounded-2xl p-2 shadow-2xl border-border/50">
+                              <DropdownMenuItem onClick={() => openEdit(resource)} className="rounded-xl font-bold gap-3 cursor-pointer">
+                                <Settings2 className="size-4 text-blue-500" /> Edit Configuration
                               </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => toggleOffline(resource)}>
+                              <DropdownMenuItem onClick={() => toggleOffline(resource)} className="rounded-xl font-bold gap-3 cursor-pointer">
+                                {resource.status === 'ACTIVE' ? <EyeOff className="size-4 text-amber-500" /> : <Eye className="size-4 text-emerald-500" />}
                                 {resource.status === 'ACTIVE' ? 'Set Offline' : 'Set Active'}
                               </DropdownMenuItem>
-                              <DropdownMenuItem
-                                onClick={() => handleDelete(resource)}
-                                className="text-destructive focus:text-destructive"
-                              >
-                                Delete
+                              <div className="h-px bg-border/50 my-1 mx-1" />
+                              <DropdownMenuItem onClick={() => handleDelete(resource)} className="rounded-xl font-bold gap-3 text-rose-500 focus:text-rose-500 cursor-pointer">
+                                <Trash2 className="size-4" /> Purge Asset
                               </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
@@ -413,30 +465,37 @@ export function AdminResourceManagementPage({ embedded = false }) {
         </CardContent>
       </Card>
 
+      {/* Modern Form Modal */}
       {isFormOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/45 p-4">
-          <Card className="w-full max-w-2xl">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 border-b">
-              <CardTitle>{editingResource ? 'Edit Resource' : 'Add New Asset'}</CardTitle>
-              <Button type="button" variant="ghost" size="icon" onClick={closeForm}>
-                <X className="size-4" />
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-md p-4 animate-in fade-in duration-300">
+          <Card className="w-full max-w-3xl border-none shadow-2xl rounded-[2.5rem] overflow-hidden bg-white dark:bg-slate-900 scale-in-95 duration-300">
+            <div className="p-8 border-b border-border/50 bg-muted/20 flex items-center justify-between">
+              <div className="space-y-1">
+                <h3 className="text-2xl font-black">{editingResource ? 'Edit Asset Config' : 'Register New Asset'}</h3>
+                <p className="text-sm font-medium text-muted-foreground">Adjust operational parameters for this resource.</p>
+              </div>
+              <Button variant="ghost" size="icon" className="rounded-full hover:bg-slate-200 dark:hover:bg-slate-800" onClick={closeForm}>
+                <X className="size-5" />
               </Button>
-            </CardHeader>
-            <CardContent className="pt-6">
-              <form className="space-y-4" onSubmit={saveResource}>
-                <div className="grid gap-4 md:grid-cols-2">
+            </div>
+            
+            <CardContent className="p-8 pt-10 overflow-y-auto max-h-[70vh]">
+              <form className="space-y-8" onSubmit={saveResource}>
+                <div className="grid gap-8 md:grid-cols-2">
                   <div className="space-y-2 md:col-span-2">
-                    <label className="text-sm font-medium">Name</label>
+                    <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2"><ListChecks className="size-3" /> Official Resource Name</label>
                     <Input
                       value={formData.name}
                       onChange={(event) => setFormData((prev) => ({ ...prev, name: event.target.value }))}
-                      placeholder="e.g. Computing Lab 01"
+                      placeholder="e.g. Advanced AI Research Laboratory"
+                      className="h-12 rounded-2xl bg-slate-50 dark:bg-slate-950 border-border/50 font-bold"
                     />
                   </div>
+
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">Resource Type</label>
+                    <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Category Tier</label>
                     <select
-                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                      className="flex h-12 w-full rounded-2xl border border-border/50 bg-slate-50 dark:bg-slate-950 px-4 py-2 text-sm font-bold focus:ring-2 focus:ring-blue-500 transition-all outline-none"
                       value={formData.type}
                       onChange={(event) => setFormData((prev) => ({ ...prev, type: event.target.value }))}
                     >
@@ -445,10 +504,11 @@ export function AdminResourceManagementPage({ embedded = false }) {
                       ))}
                     </select>
                   </div>
+
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">Status</label>
+                    <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Operational Status</label>
                     <select
-                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                      className="flex h-12 w-full rounded-2xl border border-border/50 bg-slate-50 dark:bg-slate-950 px-4 py-2 text-sm font-bold focus:ring-2 focus:ring-blue-500 transition-all outline-none"
                       value={formData.status}
                       onChange={(event) => setFormData((prev) => ({ ...prev, status: event.target.value }))}
                     >
@@ -457,8 +517,9 @@ export function AdminResourceManagementPage({ embedded = false }) {
                       ))}
                     </select>
                   </div>
+
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">Maximum Capacity</label>
+                    <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2"><Users className="size-3" /> Maximum Occupancy</label>
                     <Input
                       type="number"
                       min={1}
@@ -469,76 +530,83 @@ export function AdminResourceManagementPage({ embedded = false }) {
                           capacity: Math.max(1, Number.parseInt(event.target.value || '1', 10) || 1),
                         }))
                       }
+                      className="h-12 rounded-2xl bg-slate-50 dark:bg-slate-950 border-border/50 font-bold"
                     />
                     {editingResource && (
-                      <p className="text-xs text-muted-foreground">
-                        Current peak reserved seats: <strong>{editingPeakDemand}</strong>
+                      <p className="text-[10px] font-bold text-amber-500 uppercase tracking-widest mt-1">
+                        Reserved Peak: {editingPeakDemand} Seats
                       </p>
                     )}
                   </div>
+
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">Location</label>
+                    <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2"><MapPin className="size-3" /> Geographical Location</label>
                     <Input
                       value={formData.location}
                       onChange={(event) => setFormData((prev) => ({ ...prev, location: event.target.value }))}
-                      placeholder="e.g. Building A, Floor 2"
+                      placeholder="e.g. Block C, Level 4"
+                      className="h-12 rounded-2xl bg-slate-50 dark:bg-slate-950 border-border/50 font-bold"
                     />
                   </div>
-                  <div className="space-y-2 md:col-span-2">
-                    <label className="text-sm font-medium">Image URL</label>
-                    <Input
-                      value={formData.imageUrl}
-                      onChange={(event) => setFormData((prev) => ({ ...prev, imageUrl: event.target.value }))}
-                      placeholder="https://..."
-                    />
-                    <div className="flex flex-wrap items-center gap-2">
-                      <Button type="button" variant="outline" disabled={imageUploading}>
-                        <label className="cursor-pointer">
-                          {imageUploading ? 'Uploading...' : 'Upload Image'}
+
+                  <div className="space-y-4 md:col-span-2">
+                    <div className="flex items-center justify-between">
+                       <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Visual Asset Management</label>
+                       <Button type="button" variant="outline" disabled={imageUploading} size="sm" className="rounded-xl border-blue-500 text-blue-500 font-bold">
+                        <label className="cursor-pointer flex items-center gap-2">
+                          {imageUploading ? 'Uploading...' : <><Plus className="size-3" /> Direct Upload</>}
                           <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
                         </label>
                       </Button>
-                      {formData.imageUrl && (
-                        <span className="text-xs text-emerald-600">Cloudinary image ready</span>
-                      )}
                     </div>
+                    <Input
+                      value={formData.imageUrl}
+                      onChange={(event) => setFormData((prev) => ({ ...prev, imageUrl: event.target.value }))}
+                      placeholder="Cloudinary URL or external image link..."
+                      className="h-12 rounded-2xl bg-slate-50 dark:bg-slate-950 border-border/50 font-medium"
+                    />
                     {formData.imageUrl && (
-                      <div className="mt-2 overflow-hidden rounded-md border border-border">
-                        <img src={formData.imageUrl} alt="Resource preview" className="h-40 w-full object-cover" />
+                      <div className="relative group rounded-3xl overflow-hidden border border-border/50 shadow-2xl aspect-video">
+                        <img src={formData.imageUrl} alt="Resource preview" className="size-full object-cover transition-transform group-hover:scale-105" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                        <div className="absolute bottom-4 left-4 text-white text-[10px] font-black uppercase tracking-widest">Digital Twin Preview</div>
                       </div>
                     )}
                   </div>
+
                   <div className="space-y-2 md:col-span-2">
-                    <label className="text-sm font-medium">Description</label>
+                    <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Operational Notes</label>
                     <textarea
-                      className="flex min-h-[90px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                      className="flex min-h-[120px] w-full rounded-2xl border border-border/50 bg-slate-50 dark:bg-slate-950 px-4 py-3 text-sm font-medium focus:ring-2 focus:ring-blue-500 transition-all outline-none"
                       value={formData.description}
                       onChange={(event) => setFormData((prev) => ({ ...prev, description: event.target.value }))}
-                      placeholder="Resource description..."
+                      placeholder="Maintenance schedules, special access rules, etc..."
                     />
                   </div>
-                  <div className="space-y-2 md:col-span-2">
-                    <label className="text-sm font-medium">Download URL</label>
-                    <Input
-                      value={formData.downloadUrl}
-                      onChange={(event) => setFormData((prev) => ({ ...prev, downloadUrl: event.target.value }))}
-                      placeholder="https://example.com/resource.pdf"
-                    />
-                  </div>
-                  <label className="flex items-center gap-2 text-sm md:col-span-2">
+                </div>
+
+                <div className="flex items-center justify-between p-6 rounded-3xl bg-blue-500/5 border border-blue-500/10">
+                   <label className="flex items-center gap-3 cursor-pointer">
+                    <div className={cn("size-6 rounded-lg border-2 flex items-center justify-center transition-all", formData.available ? "bg-blue-500 border-blue-500" : "bg-white dark:bg-slate-950 border-slate-300 dark:border-slate-700")}>
+                      {formData.available && <X className="size-4 text-white rotate-45" />}
+                    </div>
                     <input
                       type="checkbox"
+                      className="hidden"
                       checked={formData.available}
                       onChange={(event) => setFormData((prev) => ({ ...prev, available: event.target.checked }))}
                     />
-                    Available for booking/use
+                    <div className="space-y-0.5">
+                      <p className="text-sm font-black text-slate-900 dark:text-slate-100">Visibility Status</p>
+                      <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Public discovery & reservation access</p>
+                    </div>
                   </label>
                 </div>
 
-                <div className="flex justify-end gap-2 pt-2">
-                  <Button type="button" variant="outline" onClick={closeForm} disabled={formSaving}>Cancel</Button>
-                  <Button type="submit" disabled={formSaving}>
-                    {formSaving ? 'Saving...' : editingResource ? 'Save Changes' : 'Create Asset'}
+                <div className="flex justify-end gap-3 pt-4">
+                  <Button type="button" variant="ghost" className="h-12 px-8 rounded-2xl font-bold" onClick={closeForm} disabled={formSaving}>Discard Changes</Button>
+                  <Button type="submit" className="h-12 px-10 rounded-2xl bg-blue-600 hover:bg-blue-500 font-black shadow-xl shadow-blue-500/20" disabled={formSaving}>
+                    {formSaving ? 'Synchronizing...' : editingResource ? 'Commit Changes' : 'Register Asset'}
                   </Button>
                 </div>
               </form>
@@ -550,5 +618,5 @@ export function AdminResourceManagementPage({ embedded = false }) {
   );
 
   if (embedded) return content;
-  return <div className="p-8">{content}</div>;
+  return <div className="p-8 container">{content}</div>;
 }

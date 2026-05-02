@@ -10,6 +10,9 @@ import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
 import DashboardPage from './pages/DashboardPage';
 import HomePage from './pages/HomePage';
+import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
+import TermsOfServicePage from './pages/TermsOfServicePage';
+import SupportPage from './pages/SupportPage';
 import TicketsLayout from './layouts/TicketsLayout';
 import TicketsIndexPage from './pages/tickets/TicketsIndexPage';
 import MyTicketsPage from './pages/tickets/MyTicketsPage';
@@ -151,6 +154,10 @@ function App() {
             </ProtectedRoute>
           )}
         />
+
+        <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+        <Route path="/terms-of-service" element={<TermsOfServicePage />} />
+        <Route path="/support" element={<SupportPage />} />
 
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
